@@ -1,6 +1,6 @@
 # Info 
 
-App Name: 🐴 **달릴까말까 (Run Or Not)**
+App Name: 🐴 **달릴까말까 (Run Or Not)**  
 Team Name: APPisode   
 - [Jumy's Github](https://github.com/kdjun97)
 - [Ujun's Github](https://github.com/MentalJava)
