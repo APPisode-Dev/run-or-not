@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:run_or_not/core/style/pretendard_text.dart';
+import 'package:run_or_not/design_system/text/custom_text.dart';
+import 'package:run_or_not/design_system/text/pretendard_text.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,7 +51,12 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text('안녕하세요 김동준 입니다.', style: PretendardText.heading1),
-            Text('$_counter', style: PretendardText.bodySmall),
+            CustomText(
+              '$_counter',
+              color: Colors.black,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ],
         ),
       ),
