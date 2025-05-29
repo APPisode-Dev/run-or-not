@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:run_or_not/pretendard_text.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,11 +49,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            Text('안녕하세요 김동준 입니다.', style: PretendardText.heading1),
+            Text('$_counter', style: PretendardText.bodySmall),
           ],
         ),
       ),
@@ -60,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
