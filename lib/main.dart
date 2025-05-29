@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:run_or_not/pretendard_text.dart';
+import 'package:run_or_not/core/style/pretendard_text.dart';
 
 void main() {
   runApp(const MyApp());
