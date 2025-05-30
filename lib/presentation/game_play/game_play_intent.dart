@@ -1,3 +1,3 @@
-enum GamePlayIntent {
-  goBackButtonTapped,
-}
+abstract class GamePlayIntent {}
+
+class GoBackButtonTapped extends GamePlayIntent {}

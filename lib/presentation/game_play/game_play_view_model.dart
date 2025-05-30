@@ -28,9 +28,8 @@ class GamePlayViewModel extends ChangeNotifier {
     }
 
     switch (intent) {
-      case GamePlayIntent.goBackButtonTapped:
+      case GoBackButtonTapped():
         _routerService.goBack();
-        print("@@");
         break;
     }
   }

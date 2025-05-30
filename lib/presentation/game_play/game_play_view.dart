@@ -15,8 +15,7 @@ class GamePlayView extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            print("###");
-            _viewModel.send(GamePlayIntent.goBackButtonTapped);
+            _viewModel.send(GoBackButtonTapped());
           },
           child: const Text('Go Back'),
         ),
