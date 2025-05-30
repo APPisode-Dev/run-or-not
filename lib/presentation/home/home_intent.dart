@@ -1,4 +1,4 @@
-abstract class HomeIntent {}
+sealed class HomeIntent {}
 
 class SetLoading extends HomeIntent {
   final bool isLoading;

@@ -1,3 +1,3 @@
-abstract class GamePlayIntent {}
+sealed class GamePlayIntent {}
 
 class GoBackButtonTapped extends GamePlayIntent {}
