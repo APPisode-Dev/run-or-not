@@ -1,21 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:run_or_not/presentation/home/home_intent.dart';
+import 'package:run_or_not/presentation/home/home_state.dart';
 import 'package:run_or_not/presentation/router/app_screen.dart';
 import 'package:run_or_not/presentation/router/service/router_service.dart';
-import 'home_intent.dart';
-
-class HomeState {
-  final bool isLoading;
-  final String message;
-
-  const HomeState({this.isLoading = false, this.message = ""});
-
-  HomeState copyWith({bool? isLoading, String? message}) {
-    return HomeState(
-      isLoading: isLoading ?? this.isLoading,
-      message: message ?? this.message,
-    );
-  }
-}
 
 class HomeViewModel extends ChangeNotifier {
   final RouterService _routerService;

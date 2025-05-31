@@ -1,16 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:run_or_not/presentation/game_play/game_play_intent.dart';
+import 'package:run_or_not/presentation/game_play/game_play_state.dart';
 import 'package:run_or_not/presentation/router/service/router_service.dart';
-
-import 'game_play_intent.dart';
-
-class GamePlayState {
-  final int count;
-  GamePlayState({this.count = 0});
-
-  GamePlayState copyWith({int? count}) {
-    return GamePlayState(count: count ?? this.count);
-  }
-}
 
 class GamePlayViewModel extends ChangeNotifier {
   final RouterService _routerService;

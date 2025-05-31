@@ -1,15 +1,6 @@
 import 'package:flutter/material.dart';
-
-enum RankingIntent { increment }
-
-class RankingState {
-  final int count;
-  RankingState({this.count = 0});
-
-  RankingState copyWith({int? count}) {
-    return RankingState(count: count ?? this.count);
-  }
-}
+import 'package:run_or_not/presentation/ranking/ranking_intent.dart';
+import 'package:run_or_not/presentation/ranking/ranking_state.dart';
 
 class RankingViewModel extends ChangeNotifier {
   RankingState _state = RankingState();
@@ -17,9 +8,6 @@ class RankingViewModel extends ChangeNotifier {
 
   void onIntent(RankingIntent intent) {
     switch (intent) {
-      case RankingIntent.increment:
-        _state = _state.copyWith(count: _state.count + 1);
-        notifyListeners();
     }
   }
 }
