@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
 import 'package:run_or_not/presentation/home/home_view_model.dart';
 import 'package:run_or_not/presentation/ranking/ranking_view_model.dart';
@@ -15,6 +16,8 @@ void setupDependencies() {
   getIt.registerSingleton<RouterService>(RouterServiceImpl(router));
 
   getIt.registerFactory<HomeViewModel>(() => HomeViewModel(getIt<RouterService>()));
-  getIt.registerFactory<GamePlayViewModel>(() => GamePlayViewModel(getIt<RouterService>()));
+  getIt.registerFactoryParam<GamePlayViewModel, List<CustomCharacter>, void>(
+    (characters, _) => GamePlayViewModel(getIt<RouterService>(), characters),
+  );
   getIt.registerFactory(() => RankingViewModel());
 }

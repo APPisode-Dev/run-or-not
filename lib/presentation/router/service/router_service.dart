@@ -1,4 +1,4 @@
 abstract interface class RouterService {
-  void navigateTo(String path);
+  void navigateTo(String path, {Object? extra});
   void goBack();
 }

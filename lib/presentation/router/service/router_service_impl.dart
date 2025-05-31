@@ -7,8 +7,8 @@ class RouterServiceImpl implements RouterService {
   RouterServiceImpl(this.router);
 
   @override
-  void navigateTo(String path) {
-    router.push(path);
+  void navigateTo(String path, {Object? extra}) {
+    router.push(path, extra: extra);
   }
 
   @override
