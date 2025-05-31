@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class CustomText extends StatelessWidget {
   final String text;
-  final double? fontSize;
-  final FontWeight? fontWeight;
-  final Color? color;
+  final double fontSize;
+  final FontWeight fontWeight;
+  final Color color;
   final TextAlign? textAlign;
   final int? maxLines;
   final TextOverflow? overflow;
@@ -15,9 +15,9 @@ class CustomText extends StatelessWidget {
   const CustomText(
     this.text, {
     Key? key,
-    this.fontSize,
-    this.fontWeight,
-    this.color,
+    this.fontSize = 14,
+    this.fontWeight = FontWeight.normal,
+    this.color = Colors.black,
     this.textAlign,
     this.maxLines,
     this.overflow,
@@ -32,9 +32,9 @@ class CustomText extends StatelessWidget {
       text,
       style: TextStyle(
         fontFamily: 'Pretendard',
-        fontSize: fontSize ?? 14,
-        fontWeight: fontWeight ?? FontWeight.normal,
-        color: color ?? Colors.black,
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        color: color,
         height: height,
         decoration: decoration,
         letterSpacing: letterSpacing,
