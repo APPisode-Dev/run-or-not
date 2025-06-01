@@ -11,8 +11,15 @@ class GamePlayViewModel extends ChangeNotifier {
 
   GamePlayViewModel(
       this._routerService,
-      List<CustomCharacter> characters,
-  ): _state = GamePlayState(characters: characters);
+      List<(String, int)> characterTuples,
+  ): _state = GamePlayState(
+      characters: characterTuples.map((tuples) {
+        return CustomCharacter(
+          name: tuples.$1,
+          hexColor: tuples.$2,
+        );
+      }).toList()
+  );
 
   Future<void> send(GamePlayIntent intent) async {
     final newState = reduce(_state, intent);
