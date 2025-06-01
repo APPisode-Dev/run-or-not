@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:run_or_not/domain/use_case/game/game_use_case.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
 import 'package:run_or_not/presentation/home/home_view_model.dart';
 import 'package:run_or_not/presentation/ranking/ranking_view_model.dart';
@@ -14,9 +15,15 @@ void setupDependencies() {
   getIt.registerSingleton<GoRouter>(router);
   getIt.registerSingleton<RouterService>(RouterServiceImpl(router));
 
+  getIt.registerFactory(() => GameUseCase());
+
   getIt.registerFactory<HomeViewModel>(() => HomeViewModel(getIt<RouterService>()));
   getIt.registerFactoryParam<GamePlayViewModel, List<(String, int)>, void>(
-    (characterTuples, _) => GamePlayViewModel(getIt<RouterService>(), characterTuples),
+    (characterTuples, _) => GamePlayViewModel(
+        getIt<RouterService>(),
+        characterTuples,
+        getIt<GameUseCase>(),
+    ),
   );
   getIt.registerFactory(() => RankingViewModel());
 }
