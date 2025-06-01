@@ -25,10 +25,10 @@ GoRouter createRouter() {
       GoRoute(
         path: AppScreen.gamePlay.path,
         builder: (context, state) {
-          final characters = state.extra as List<(String, int)>;
+          final characterTuples = state.extra as List<(String, int)>;
 
           return ChangeNotifierProvider(
-            create: (_) => getIt<GamePlayViewModel>(param1: characters),
+            create: (_) => getIt<GamePlayViewModel>(param1: characterTuples),
             child: GamePlayView(),
           );
         }
