@@ -15,6 +15,8 @@ void setupDependencies() {
   getIt.registerSingleton<RouterService>(RouterServiceImpl(router));
 
   getIt.registerFactory<HomeViewModel>(() => HomeViewModel(getIt<RouterService>()));
-  getIt.registerFactory<GamePlayViewModel>(() => GamePlayViewModel(getIt<RouterService>()));
+  getIt.registerFactoryParam<GamePlayViewModel, List<(String, int)>, void>(
+    (characterTuples, _) => GamePlayViewModel(getIt<RouterService>(), characterTuples),
+  );
   getIt.registerFactory(() => RankingViewModel());
 }

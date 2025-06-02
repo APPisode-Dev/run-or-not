@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/presentation/game_play/game_play_intent.dart';
 import 'package:run_or_not/presentation/game_play/game_play_state.dart';
 import 'package:run_or_not/presentation/router/service/router_service.dart';
 
 class GamePlayViewModel extends ChangeNotifier {
   final RouterService _routerService;
-
-  GamePlayViewModel(this._routerService);
-
-  GamePlayState _state = GamePlayState();
+  GamePlayState _state;
   GamePlayState get state => _state;
+
+  GamePlayViewModel(
+      this._routerService,
+      List<(String, int)> characterTuples,
+  ): _state = GamePlayState(
+      characters: characterTuples.map((tuples) {
+        return CustomCharacter(
+          name: tuples.$1,
+          hexColor: tuples.$2,
+        );
+      }).toList()
+  );
 
   Future<void> send(GamePlayIntent intent) async {
     final newState = reduce(_state, intent);
