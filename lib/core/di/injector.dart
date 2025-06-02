@@ -15,7 +15,7 @@ void setupDependencies() {
   getIt.registerSingleton<GoRouter>(router);
   getIt.registerSingleton<RouterService>(RouterServiceImpl(router));
 
-  getIt.registerFactory(() => GameUseCase());
+  getIt.registerLazySingleton<GameUseCase>(() => GameUseCase());
 
   getIt.registerFactory<HomeViewModel>(() => HomeViewModel(getIt<RouterService>()));
   getIt.registerFactoryParam<GamePlayViewModel, List<(String, int)>, void>(
