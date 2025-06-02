@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/presentation/game_play/game_play_intent.dart';
@@ -8,18 +10,36 @@ class GamePlayViewModel extends ChangeNotifier {
   final RouterService _routerService;
   GamePlayState _state;
   GamePlayState get state => _state;
+  Timer? _timer;
 
   GamePlayViewModel(
-      this._routerService,
-      List<(String, int)> characterTuples,
+    this._routerService,
+    List<(String, int)> characterTuples,
   ): _state = GamePlayState(
-      characters: characterTuples.map((tuples) {
-        return CustomCharacter(
-          name: tuples.$1,
-          hexColor: tuples.$2,
-        );
-      }).toList()
+    characterList: characterTuples.map((tuples) {
+      final _name = tuples.$1;
+      final _hexColor = tuples.$2;
+
+      return CustomCharacter(
+        name: _name,
+        hexColor: _hexColor,
+        speed: Random().nextInt(20) + 1,
+        positionX: 0,
+        isFinished: false,
+      );
+    }).toList(),
   );
+
+  @override
+  void dispose() {
+    _timerDispose();
+    super.dispose();
+  }
+
+  void _timerDispose() {
+    _timer?.cancel();
+    _timer = null;
+  }
 
   Future<void> send(GamePlayIntent intent) async {
     final newState = reduce(_state, intent);
@@ -32,11 +52,42 @@ class GamePlayViewModel extends ChangeNotifier {
       case GoBackButtonTapped():
         _routerService.goBack();
         break;
+      case TimerStartButtonTapped():
+        _timer?.cancel();
+
+        _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+          send(UpdatePositionXWithSpeed());
+
+          bool _isAllPlayerFinish = _state.characterList.every((character) => character.isFinished);
+          if (_isAllPlayerFinish) {
+            _timerDispose();
+          }
+        });
+        break;
+      default:
+        break;
     }
   }
 
   GamePlayState reduce(GamePlayState current, GamePlayIntent intent) {
     switch (intent) {
+      case UpdatePositionXWithSpeed():
+        final double _avatarCircleSize = 40;
+        final maxX = current.maxDeviceWidth - (_avatarCircleSize + current.horizontalSafeArea);
+
+        final _updatedCharacterList = current.characterList.map((character) {
+          if (character.isFinished || character.positionX >= maxX) {
+            return character.copyWith(isFinished: true);
+          } else {
+            return character.copyWith(
+              positionX: character.positionX + character.speed,
+            );
+          }
+        }).toList();
+
+        return current.copyWith(characterList: _updatedCharacterList);
+      case UpdateMaxDeviceWidthAndSafeArea(:final maxDeviceWidth, :final horizontalSafeArea):
+        return current.copyWith(maxDeviceWidth: maxDeviceWidth, horizontalSafeArea: horizontalSafeArea);
       default:
         return current;
     }

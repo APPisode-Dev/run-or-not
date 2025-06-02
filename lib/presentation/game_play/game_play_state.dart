@@ -1,21 +1,25 @@
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 
 class GamePlayState {
-  final int count;
-  final List<CustomCharacter> characters;
+  final List<CustomCharacter> characterList;
+  final double maxDeviceWidth;
+  final double horizontalSafeArea;
 
   GamePlayState({
-    this.count = 0,
-    required this.characters,
+    required this.characterList,
+    this.maxDeviceWidth = 376,
+    this.horizontalSafeArea = 0,
   });
 
   GamePlayState copyWith({
-    int? count,
-    List<CustomCharacter>? characters,
+    List<CustomCharacter>? characterList,
+    double? maxDeviceWidth,
+    double? horizontalSafeArea,
   }) {
     return GamePlayState(
-        count: count ?? this.count,
-        characters: characters ?? this.characters,
+      characterList: characterList ?? this.characterList,
+      maxDeviceWidth: maxDeviceWidth ?? this.maxDeviceWidth,
+      horizontalSafeArea: horizontalSafeArea ?? this.horizontalSafeArea,
     );
   }
 }
