@@ -1,14 +1,9 @@
-class RankingState {
-  final int count;
-  RankingState({
-    this.count = 0
-  });
+import 'package:run_or_not/domain/model/character/custom_character.dart';
 
-  RankingState copyWith({
-    int? count
-  }) {
-    return RankingState(
-        count: count ?? this.count
-    );
-  }
+class RankingState {
+  final List<CustomCharacter> characterList;
+
+  RankingState({
+    required this.characterList,
+  });
 }

@@ -5,6 +5,7 @@ import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/domain/use_case/game/game_use_case.dart';
 import 'package:run_or_not/presentation/game_play/game_play_intent.dart';
 import 'package:run_or_not/presentation/game_play/game_play_state.dart';
+import 'package:run_or_not/presentation/router/app_screen.dart';
 import 'package:run_or_not/presentation/router/service/router_service.dart';
 
 class GamePlayViewModel extends ChangeNotifier {
@@ -54,6 +55,12 @@ class GamePlayViewModel extends ChangeNotifier {
     switch (intent) {
       case GoBackButtonTapped():
         _routerService.goBack();
+        break;
+      case RankingButtonTapped():
+        final charactersTuples = _state.characterList.map((character) {
+          return (character.name, character.hexColor, character.rank);
+        }).toList();
+        _routerService.navigateTo(AppScreen.ranking.path, extra: charactersTuples);
         break;
       case TimerStartButtonTapped():
         _timer?.cancel();

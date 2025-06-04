@@ -29,6 +29,9 @@ class GamePlayView extends StatelessWidget {
               startButtonAction: () {
                 _viewModel.send(TimerStartButtonTapped());
               },
+              rankingButtonAction: () {
+                _viewModel.send(RankingButtonTapped());
+              },
             ),
             RaceLineListView(
               characters: _viewModel.state.characterList,
@@ -44,6 +47,7 @@ class GamePlayView extends StatelessWidget {
   Widget _buttonRowView({
     required VoidCallback goBackButtonAction,
     required VoidCallback startButtonAction,
+    required VoidCallback rankingButtonAction,
   }) {
     return Row(
       children: [
@@ -54,6 +58,17 @@ class GamePlayView extends StatelessWidget {
         ElevatedButton(
           onPressed: startButtonAction,
           child: const Text('timer start'),
+        ),
+        Selector<GamePlayViewModel, bool>(
+          selector: (context, viewModel) => viewModel.state.shouldShowRankingButton,
+          builder: (context, shouldShowRankingButton, _) {
+            return shouldShowRankingButton
+              ? ElevatedButton(
+                  onPressed: rankingButtonAction,
+                  child: const Text('Ranking View'),
+                )
+              : const SizedBox.shrink();
+          },
         ),
       ],
     );

@@ -4,6 +4,9 @@ class GamePlayState {
   final List<CustomCharacter> characterList;
   final double maxDeviceWidth;
   final double horizontalSafeArea;
+  bool get shouldShowRankingButton {
+    return characterList.every((character) => character.isFinished);
+  }
 
   GamePlayState({
     required this.characterList,
@@ -15,6 +18,7 @@ class GamePlayState {
     List<CustomCharacter>? characterList,
     double? maxDeviceWidth,
     double? horizontalSafeArea,
+    bool? isRankingButtonVisible,
   }) {
     return GamePlayState(
       characterList: characterList ?? this.characterList,
