@@ -1,5 +1,6 @@
 enum AppScreen {
   home('/home'),
+  homeDetail('/homeDetail'),
   gamePlay('/gamePlay'),
   ranking('/ranking');
 
