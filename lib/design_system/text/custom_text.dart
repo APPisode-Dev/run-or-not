@@ -31,7 +31,7 @@ class CustomText extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        fontFamily: 'Pretendard',
+        fontFamily: 'mabi',
         fontSize: fontSize,
         fontWeight: fontWeight,
         color: color,
