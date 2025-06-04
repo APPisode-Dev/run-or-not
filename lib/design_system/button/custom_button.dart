@@ -22,7 +22,6 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onPressed,
-
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(borderRadius),
@@ -32,7 +31,7 @@ class CustomButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: faceColor,
             borderRadius: BorderRadius.circular(borderRadius),
-            border: outlineColor.toAllBorder(),
+            border: _getOutlineBorder(outlineColor),
             boxShadow: [
               BoxShadow(
                 color: Colors.black,
@@ -46,14 +45,9 @@ class CustomButton extends StatelessWidget {
       ),
     );
   }
-}
 
-extension NullableColorBorderExtension on Color? {
-  Border? toAllBorder({double width = 1.5}) {
-    final color = this;
-    if (color != null) {
-      return Border.all(color: color, width: width);
-    }
-    return null;
+  Border? _getOutlineBorder(Color? outlineColor) {
+    if (outlineColor == null) return null;
+    return Border.all(color: outlineColor, width: 1.5);
   }
 }
