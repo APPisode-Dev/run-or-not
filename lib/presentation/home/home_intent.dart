@@ -12,4 +12,4 @@ class ChangeText extends HomeIntent {
 
 class ChangeButtonTapped extends HomeIntent {}
 
-class NavigateToGamePlay extends HomeIntent {}
+class NavigateToHomeDetail extends HomeIntent {}

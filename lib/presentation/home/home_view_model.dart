@@ -27,8 +27,8 @@ class HomeViewModel extends ChangeNotifier {
         send(SetLoading(false));
         break;
 
-      case NavigateToGamePlay():
-        _routerService.navigateTo(AppScreen.gamePlay.path);
+      case NavigateToHomeDetail():
+        _routerService.navigateTo(AppScreen.homeDetail.path);
         break;
 
       default:
