@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:run_or_not/design_system/text/pretendard_text.dart';
+import 'package:run_or_not/design_system/text/custom_text_style.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
 
@@ -90,7 +90,7 @@ class RaceLineListView extends StatelessWidget {
       right: 10,
       child: Text(
         name,
-        style: PretendardText.bodySmall.copyWith(color: Colors.white),
+        style: CustomTextStyle.bodySmall.copyWith(color: Colors.white),
       ),
     );
   }
@@ -106,7 +106,7 @@ class RaceLineListView extends StatelessWidget {
         return (_isFinished && _rank != null)
             ? Text(
               "$_rank등",
-              style: PretendardText.bodySmall.copyWith(color: Colors.black),
+              style: CustomTextStyle.bodySmall.copyWith(color: Colors.black),
             )
             : const SizedBox.shrink();
       },
