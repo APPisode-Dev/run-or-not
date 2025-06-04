@@ -5,6 +5,8 @@ import 'package:run_or_not/presentation/game_play/game_play_view.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
 import 'package:run_or_not/presentation/home/home_view.dart';
 import 'package:run_or_not/presentation/home/home_view_model.dart';
+import 'package:run_or_not/presentation/home_detail/home_detail_view.dart';
+import 'package:run_or_not/presentation/home_detail/home_detail_view_model.dart';
 import 'package:run_or_not/presentation/ranking/ranking_view.dart';
 import 'package:run_or_not/presentation/ranking/ranking_view_model.dart';
 import 'app_screen.dart';
@@ -19,6 +21,15 @@ GoRouter createRouter() {
           return ChangeNotifierProvider(
             create: (_) => getIt<HomeViewModel>() ,
             child: HomeView(),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppScreen.homeDetail.path,
+        builder: (context, state) {
+          return ChangeNotifierProvider(
+            create: (_) => getIt<HomeDetailViewModel>() ,
+            child: HomeDetailView(),
           );
         },
       ),

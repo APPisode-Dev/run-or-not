@@ -16,7 +16,7 @@ class HomeView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Selector<HomeViewModel, bool>(
-            selector: (context, vm) => vm.state.isLoading,
+            selector: (context, viewModel) => viewModel.state.isLoading,
             builder: (context, isLoading, _) {
               return isLoading
                   ? const CircularProgressIndicator()
@@ -25,7 +25,7 @@ class HomeView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Selector<HomeViewModel, String>(
-            selector: (context, vm) => vm.state.message,
+            selector: (context, viewModel) => viewModel.state.message,
             builder: (context, message, _) {
               return Text(message);
             },
@@ -38,8 +38,8 @@ class HomeView extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () =>
-                _viewModel.send(NavigateToGamePlay()),
-            child: const Text("Game Play View 이동"),
+                _viewModel.send(NavigateToHomeDetail()),
+            child: const Text("Home Detail View 이동"),
           ),
         ],
       ),
