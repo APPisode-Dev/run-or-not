@@ -1,14 +1,29 @@
+import 'package:run_or_not/domain/model/character/custom_character.dart';
+
 class GamePlayState {
-  final int count;
+  final List<CustomCharacter> characterList;
+  final double maxDeviceWidth;
+  final double horizontalSafeArea;
+  bool get shouldShowRankingButton {
+    return characterList.every((character) => character.isFinished);
+  }
+
   GamePlayState({
-    this.count = 0
+    required this.characterList,
+    this.maxDeviceWidth = 376,
+    this.horizontalSafeArea = 0,
   });
 
   GamePlayState copyWith({
-    int? count
+    List<CustomCharacter>? characterList,
+    double? maxDeviceWidth,
+    double? horizontalSafeArea,
+    bool? isRankingButtonVisible,
   }) {
     return GamePlayState(
-        count: count ?? this.count
+      characterList: characterList ?? this.characterList,
+      maxDeviceWidth: maxDeviceWidth ?? this.maxDeviceWidth,
+      horizontalSafeArea: horizontalSafeArea ?? this.horizontalSafeArea,
     );
   }
 }
