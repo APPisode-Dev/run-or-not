@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-abstract class PretendardText {
-  static const String _fontFamily = 'Pretendard';
+abstract class CustomTextStyle {
+  static const String _fontFamily = 'mabi';
 
   // Heading Styles
   static const TextStyle heading1 = TextStyle(
