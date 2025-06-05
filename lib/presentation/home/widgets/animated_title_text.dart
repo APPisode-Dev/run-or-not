@@ -42,9 +42,9 @@ class _AnimatedTitleTextState extends State<AnimatedTitleText>
       child: Text(
         '달릴까 말까 !?',
         textAlign: TextAlign.center,
-        style: CustomTextStyle.heading1.copyWith(
+        style: CustomTextStyle.displayMedium.copyWith(
           color: AppColors.peach,
-          fontSize: 48,
+
           shadows: [
             Shadow(
               offset: const Offset(2.0, 2.0),
