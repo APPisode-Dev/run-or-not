@@ -64,7 +64,7 @@ class HomeView extends StatelessWidget {
                           faceColor: AppColors.peach,
                           borderRadius: 15,
                           onPressed: () {
-                            _viewModel.send(NavigateToHomeDetail());
+                            print('설정하기 이동');
                           },
                         ),
                       ),
