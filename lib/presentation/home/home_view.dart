@@ -59,7 +59,7 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Padding homeButton({required String text, required VoidCallback action}) {
+  Widget homeButton({required String text, required VoidCallback action}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: CustomButton(
