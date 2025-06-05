@@ -40,34 +40,13 @@ class HomeView extends StatelessWidget {
                     spacing: 10,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: CustomButton(
-                          child: Text(
-                            '시작하기',
-                            style: CustomTextStyle.buttonLarge,
-                          ),
-                          faceColor: AppColors.peach,
-                          borderRadius: 15,
-                          onPressed: () {
-                            _viewModel.send(NavigateToHomeDetail());
-                          },
-                        ),
+                      homeButton(
+                        text: '시작하기',
+                        action: () {
+                          _viewModel.send(NavigateToHomeDetail());
+                        },
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: CustomButton(
-                          child: Text(
-                            '설정하기',
-                            style: CustomTextStyle.buttonLarge,
-                          ),
-                          faceColor: AppColors.peach,
-                          borderRadius: 15,
-                          onPressed: () {
-                            print('설정하기 이동');
-                          },
-                        ),
-                      ),
+                      homeButton(text: '설정하기', action: () {}),
                     ],
                   ),
                 ],
@@ -75,6 +54,20 @@ class HomeView extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Padding homeButton({required String text, required VoidCallback action}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: CustomButton(
+        child: Text(text, style: CustomTextStyle.buttonLarge),
+        faceColor: AppColors.peach,
+        borderRadius: 15,
+        onPressed: () {
+          action();
+        },
       ),
     );
   }
