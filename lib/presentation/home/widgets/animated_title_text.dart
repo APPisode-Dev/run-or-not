@@ -44,7 +44,6 @@ class _AnimatedTitleTextState extends State<AnimatedTitleText>
         textAlign: TextAlign.center,
         style: CustomTextStyle.displayMedium.copyWith(
           color: AppColors.peach,
-
           shadows: [
             Shadow(
               offset: const Offset(2.0, 2.0),
