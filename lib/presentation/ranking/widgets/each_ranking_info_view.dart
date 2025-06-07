@@ -18,10 +18,8 @@ class EachRankingInfoView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-
     return Container(
-      color: isEven ? AppColors.paleLemon .withValues(alpha: 0.5) : Colors.transparent,
+      color: isEven ? AppColors.paleLemon.withValues(alpha: 0.5) : Colors.transparent,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
         child: Container(
@@ -30,7 +28,7 @@ class EachRankingInfoView extends StatelessWidget {
             children: [
               Expanded(
                 flex: 1,
-                child: _characterRankDisplayView(_isLandscape),
+                child: _characterRankDisplayView(),
               ),
               Expanded(
                 flex: 7,
@@ -47,7 +45,7 @@ class EachRankingInfoView extends StatelessWidget {
     );
   }
 
-  Widget _characterRankDisplayView(bool isLandscape) {
+  Widget _characterRankDisplayView() {
     final _medals = ["🥇", "🥈", "🥉"];
     final _hasMedal = index < 3;
 
