@@ -12,20 +12,43 @@ class RankingViewModel extends ChangeNotifier {
 
   RankingViewModel(
       this._routerService,
-      List<(String, int, int?)> characterTuples,
+      List<(String, int, int)> characterTuples,
       ): _state = RankingState(
-      characterList: characterTuples.map((tuples) {
+      characterList: _sortedCharacters(characterTuples),
+  );
 
+  static List<CustomCharacter> _sortedCharacters(List<(String, int, int)> characterTuples) {
+    final list = characterTuples.map((tuples) {
       return CustomCharacter(
         name: tuples.$1,
         hexColor: tuples.$2,
-        rank: tuples.$3
+        rank: tuples.$3,
       );
-    }).toList(),
-  );
+    }).toList();
 
-  void onIntent(RankingIntent intent) {
+    list.sort((a, b) => a.rank.compareTo(b.rank));
+
+    return list;
+  }
+
+  Future<void> send(RankingIntent intent) async {
+    final newState = reduce(_state, intent);
+    if (newState != _state) {
+      _state = newState;
+      notifyListeners();
+    }
+
     switch (intent) {
+      case HomeButtonTapped():
+        _routerService.goRoot();
+        break;
+    }
+  }
+
+  RankingState reduce(RankingState current, RankingIntent intent) {
+    switch (intent) {
+      default:
+        return current;
     }
   }
 }

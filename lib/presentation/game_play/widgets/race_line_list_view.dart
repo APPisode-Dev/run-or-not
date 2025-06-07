@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:run_or_not/design_system/text/custom_text_style.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
+import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
 
 class RaceLineListView extends StatelessWidget {
   final List<CustomCharacter> characters;
   final double maxWidth;
-  final double _containerHeight = 44;
-  final double _avatarCircleSize = 40;
 
   const RaceLineListView({
     super.key,
@@ -31,7 +30,7 @@ class RaceLineListView extends StatelessWidget {
                         viewModel.state.characterList[_index].isFinished,
                 builder: (context, isFinished, _) {
                   return Container(
-                    height: _containerHeight,
+                    height: WidgetSizes.gamePlayContainerHeight,
                     decoration: BoxDecoration(
                       color: Color(
                         _character.hexColor,
@@ -70,8 +69,8 @@ class RaceLineListView extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
             child: Container(
-              width: _avatarCircleSize,
-              height: _avatarCircleSize,
+              width: WidgetSizes.avatarCircleSize,
+              height: WidgetSizes.avatarCircleSize,
               decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,

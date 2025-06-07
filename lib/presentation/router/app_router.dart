@@ -47,7 +47,7 @@ GoRouter createRouter() {
       GoRoute(
         path: AppScreen.ranking.path,
         builder: (context, state) {
-          final characterTuples = state.extra as List<(String, int, int?)>;
+          final characterTuples = state.extra as List<(String, int, int)>;
 
           return ChangeNotifierProvider(
             create: (_) => getIt<RankingViewModel>(param1: characterTuples) ,
