@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/domain/use_case/game/game_use_case.dart';
+import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
 import 'package:run_or_not/presentation/game_play/game_play_intent.dart';
 import 'package:run_or_not/presentation/game_play/game_play_state.dart';
 import 'package:run_or_not/presentation/router/app_screen.dart';
@@ -82,7 +83,7 @@ class GamePlayViewModel extends ChangeNotifier {
   GamePlayState reduce(GamePlayState current, GamePlayIntent intent) {
     switch (intent) {
       case UpdatePositionXWithSpeed():
-        final double _avatarCircleSize = 40;
+        final double _avatarCircleSize = WidgetSizes.avatarCircleSize;
         final double _maxDeviceWidth = current.maxDeviceWidth - (_avatarCircleSize + current.horizontalSafeArea);
 
         final _updatedCharacterList = _gameUseCase.moveCharactersAndAssignRanks(

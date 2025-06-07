@@ -41,12 +41,12 @@ class GameUseCase {
 
   List<CustomCharacter> _updateRanks(List<CustomCharacter> characterList) {
     final _unrankedFinished =
-        characterList.where((c) => c.isFinished && c.rank == null).toList()
+        characterList.where((character) => character.isFinished && character.rank == 0).toList()
           ..sort(
             (a, b) => b.positionX.compareTo(a.positionX),
           ); // positionX 큰 순서대로
 
-    int _nextRank = characterList.where((c) => c.rank != null).length + 1;
+    int _nextRank = characterList.where((character) => character.rank != 0).length + 1;
 
     final _rankedList =
         characterList.map((character) {

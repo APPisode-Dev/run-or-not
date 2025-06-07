@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:run_or_not/presentation/router/app_screen.dart';
 import 'package:run_or_not/presentation/router/service/router_service.dart';
 
 class RouterServiceImpl implements RouterService {
@@ -21,5 +22,14 @@ class RouterServiceImpl implements RouterService {
     if (_navigator.canPop()) {
       _navigator.pop();
     }
+  }
+
+  @override
+  void goRoot() {
+    _navigateAndClearStack(AppScreen.home);
+  }
+
+  void _navigateAndClearStack(AppScreen screen) {
+    router.go(screen.path);
   }
 }
