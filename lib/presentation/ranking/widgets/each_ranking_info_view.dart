@@ -3,6 +3,7 @@ import 'package:run_or_not/design_system/color/app_colors.dart';
 import 'package:run_or_not/design_system/text/custom_text_style.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
+import 'package:run_or_not/presentation/core/widgets/avatar_view.dart';
 
 class EachRankingInfoView extends StatelessWidget {
   final int index;
@@ -36,7 +37,7 @@ class EachRankingInfoView extends StatelessWidget {
               ),
               Expanded(
                 flex: 2,
-                child: _avatarView(customCharacter),
+                child: AvatarView(assetName: customCharacter.assetName),
               ),
             ],
           ),
@@ -77,22 +78,6 @@ class EachRankingInfoView extends StatelessWidget {
         customCharacter.name,
         style: CustomTextStyle.bodyMedium.copyWith(color: Colors.black),
         textAlign: TextAlign.right,
-      ),
-    );
-  }
-
-  Widget _avatarView(CustomCharacter customCharacter) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-        child: Container(
-          width: WidgetSizes.avatarCircleSize,
-          height: WidgetSizes.avatarCircleSize,
-          child: Image.asset(
-            customCharacter.assetName,
-            fit: BoxFit.contain,
-          ),
-        ),
       ),
     );
   }
