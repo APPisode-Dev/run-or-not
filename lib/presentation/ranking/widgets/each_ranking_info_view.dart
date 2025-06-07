@@ -51,26 +51,24 @@ class EachRankingInfoView extends StatelessWidget {
     final _medals = ["🥇", "🥈", "🥉"];
     final _hasMedal = index < 3;
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Center(
-          child: Text(
+    return Center(
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          if (!_hasMedal)
+          Text(
             "${index + 1}",
             style: CustomTextStyle.bodyMedium.copyWith(color: Colors.black),
             textAlign: TextAlign.center,
           ),
-        ),
-        if (_hasMedal)
-          Positioned(
-            top: isLandscape ? -4 : -4,
-            right: isLandscape ? 12 : -12,
-            child: Text(
+          if (_hasMedal)
+            Text(
               _medals[index],
-              style: CustomTextStyle.titleLarge,
+              style: CustomTextStyle.heading3,
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 
