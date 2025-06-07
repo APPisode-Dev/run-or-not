@@ -28,7 +28,7 @@ void setupDependencies() {
         getIt<GameUseCase>(),
     ),
   );
-  getIt.registerFactoryParam<RankingViewModel, List<(String, int, int?)>, void>(
+  getIt.registerFactoryParam<RankingViewModel, List<(String, int, int)>, void>(
     (characterTuples, _) => RankingViewModel(
       getIt<RouterService>(),
       characterTuples,

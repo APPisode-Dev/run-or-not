@@ -4,7 +4,7 @@ class CustomCharacter {
   final double speed;
   final double positionX;
   final bool isFinished;
-  final int? rank;
+  final int rank;
 
   const CustomCharacter({
     required this.name,
@@ -12,7 +12,7 @@ class CustomCharacter {
     this.speed = 0.1,
     this.positionX = 0,
     this.isFinished = false,
-    this.rank,
+    this.rank = 0,
   });
 
   CustomCharacter copyWith({
