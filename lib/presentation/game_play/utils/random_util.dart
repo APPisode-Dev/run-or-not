@@ -1,6 +1,6 @@
 import 'dart:math';
 
-class RandomUtil {
+abstract class RandomUtil {
   static final Random _random = Random();
 
   static double getDoubleMinMaxRangeValue(double min, double max) {
