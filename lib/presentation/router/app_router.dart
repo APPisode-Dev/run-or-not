@@ -38,10 +38,10 @@ GoRouter createRouter() {
       GoRoute(
         path: AppScreen.gamePlay.path,
         builder: (context, state) {
-          final characterTuples = state.extra as List<(String, int)>;
+          final characterList = state.extra as List<String>;
 
           return ChangeNotifierProvider(
-            create: (_) => getIt<GamePlayViewModel>(param1: characterTuples),
+            create: (_) => getIt<GamePlayViewModel>(param1: characterList),
             child: GamePlayView(),
           );
         }
@@ -49,7 +49,7 @@ GoRouter createRouter() {
       GoRoute(
         path: AppScreen.ranking.path,
         builder: (context, state) {
-          final characterTuples = state.extra as List<(String, int, int)>;
+          final characterTuples = state.extra as List<(String, int)>;
 
           return ChangeNotifierProvider(
             create: (_) => getIt<RankingViewModel>(param1: characterTuples) ,

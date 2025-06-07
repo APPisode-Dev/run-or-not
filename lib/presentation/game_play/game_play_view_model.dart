@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/domain/use_case/game/game_use_case.dart';
 import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
 import 'package:run_or_not/presentation/game_play/game_play_intent.dart';
 import 'package:run_or_not/presentation/game_play/game_play_state.dart';
+import 'package:run_or_not/presentation/game_play/utils/random_util.dart';
 import 'package:run_or_not/presentation/router/app_screen.dart';
 import 'package:run_or_not/presentation/router/service/router_service.dart';
 
@@ -18,17 +18,15 @@ class GamePlayViewModel extends ChangeNotifier {
 
   GamePlayViewModel(
     this._routerService,
-    List<(String, int)> characterTuples,
+    List<String> characterList,
     this._gameUseCase,
   ): _state = GamePlayState(
-    characterList: characterTuples.map((tuples) {
-      final _name = tuples.$1;
-      final _hexColor = tuples.$2;
+    characterList: characterList.map((character) {
+      final _name = character;
 
       return CustomCharacter(
         name: _name,
-        hexColor: _hexColor,
-        speed: Random().nextInt(20) + 1,
+        speed: RandomUtil.getDoubleMinMaxRangeValue(3, 10),
         positionX: 0,
         isFinished: false,
       );
@@ -59,11 +57,11 @@ class GamePlayViewModel extends ChangeNotifier {
         break;
       case RankingButtonTapped():
         final charactersTuples = _state.characterList.map((character) {
-          return (character.name, character.hexColor, character.rank);
+          return (character.name, character.rank);
         }).toList();
         _routerService.navigateTo(AppScreen.ranking.path, extra: charactersTuples);
         break;
-      case TimerStartButtonTapped():
+      case StartButtonTapped():
         _timer?.cancel();
 
         _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
@@ -75,6 +73,8 @@ class GamePlayViewModel extends ChangeNotifier {
           }
         });
         break;
+      case RetryButtonTapped():
+        send(StartButtonTapped());
       default:
         break;
     }
@@ -95,6 +95,19 @@ class GamePlayViewModel extends ChangeNotifier {
         return current.copyWith(characterList: _updatedCharacterList);
       case UpdateMaxDeviceWidthAndSafeArea(:final maxDeviceWidth, :final horizontalSafeArea):
         return current.copyWith(maxDeviceWidth: maxDeviceWidth, horizontalSafeArea: horizontalSafeArea);
+      case RetryButtonTapped():
+        final newCharacterList = current.characterList.map((character){
+          return CustomCharacter(
+            name: character.name,
+            speed: RandomUtil.getDoubleMinMaxRangeValue(5, 15),
+            positionX: 0,
+            isFinished: false,
+          );
+        }).toList();
+
+        return current.copyWith(
+          characterList: newCharacterList
+        );
       default:
         return current;
     }

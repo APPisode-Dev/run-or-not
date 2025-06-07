@@ -22,9 +22,9 @@ class HomeDetailViewModel extends ChangeNotifier {
     switch (intent) {
       case NavigateToGamePlay():
         final dummyCharactersTuples = [
-          ('말1', 0xFFE57373),
-          ('말2', 0xFF64B5F6),
-          ('말3', 0xFF81C784),
+          ('말1'),
+          ('말2'),
+          ('말3'),
         ];
 
         _routerService.navigateTo(AppScreen.gamePlay.path, extra: dummyCharactersTuples);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:run_or_not/design_system/color/app_colors.dart';
 import 'package:run_or_not/design_system/text/custom_text_style.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
@@ -23,6 +24,7 @@ class RaceLineListView extends StatelessWidget {
             characters.asMap().entries.map((entry) {
               final _index = entry.key;
               final _character = entry.value;
+              final _isEven = _index % 2 == 0;
 
               return Selector<GamePlayViewModel, bool>(
                 selector:
@@ -32,10 +34,7 @@ class RaceLineListView extends StatelessWidget {
                   return Container(
                     height: WidgetSizes.gamePlayContainerHeight,
                     decoration: BoxDecoration(
-                      color: Color(
-                        _character.hexColor,
-                      ).withValues(alpha: isFinished ? 0.5 : 1.0),
-                      borderRadius: BorderRadius.circular(8),
+                      color: _getLineBackgroundColor(_isEven, isFinished),
                     ),
                     child: Stack(
                       children: [
@@ -89,7 +88,7 @@ class RaceLineListView extends StatelessWidget {
       right: 10,
       child: Text(
         name,
-        style: CustomTextStyle.bodySmall.copyWith(color: Colors.white),
+        style: CustomTextStyle.bodySmall.copyWith(color: Colors.black),
       ),
     );
   }
@@ -110,5 +109,17 @@ class RaceLineListView extends StatelessWidget {
             : const SizedBox.shrink();
       },
     );
+  }
+
+  Color _getLineBackgroundColor(bool isEven, bool isFinished) {
+    if (isFinished) {
+      return AppColors.peach;
+    } else {
+      if (isEven) {
+        return Colors.transparent;
+      } else {
+        return AppColors.paleLemon.withValues(alpha: 0.5);
+      }
+    }
   }
 }
