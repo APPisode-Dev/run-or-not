@@ -8,6 +8,7 @@ import 'package:run_or_not/presentation/ranking/ranking_view_model.dart';
 import 'package:run_or_not/presentation/router/app_router.dart';
 import 'package:run_or_not/presentation/router/service/router_service.dart';
 import 'package:run_or_not/presentation/router/service/router_service_impl.dart';
+import 'package:run_or_not/presentation/setting/setting_view_model.dart';
 
 final getIt = GetIt.instance;
 
@@ -33,4 +34,5 @@ void setupDependencies() {
       characterTuples,
     )
   );
+  getIt.registerFactory<SettingViewModel>(() => SettingViewModel(getIt<RouterService>()));
 }

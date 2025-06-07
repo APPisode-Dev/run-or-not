@@ -9,6 +9,8 @@ import 'package:run_or_not/presentation/home_detail/home_detail_view.dart';
 import 'package:run_or_not/presentation/home_detail/home_detail_view_model.dart';
 import 'package:run_or_not/presentation/ranking/ranking_view.dart';
 import 'package:run_or_not/presentation/ranking/ranking_view_model.dart';
+import 'package:run_or_not/presentation/setting/setting_view.dart';
+import 'package:run_or_not/presentation/setting/setting_view_model.dart';
 import 'app_screen.dart';
 
 GoRouter createRouter() {
@@ -54,6 +56,15 @@ GoRouter createRouter() {
             child: RankingView(),
           );
         }
+      ),
+      GoRoute(
+        path: AppScreen.setting.path,
+        builder: (context, state) {
+          return ChangeNotifierProvider(
+            create: (_) => getIt<SettingViewModel>() ,
+            child: SettingView(),
+          );
+        },
       ),
     ],
   );

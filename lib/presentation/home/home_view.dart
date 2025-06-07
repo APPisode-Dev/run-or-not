@@ -57,10 +57,15 @@ class HomeView extends StatelessWidget {
                           homeButton(
                             text: '시작하기',
                             action: () {
-                              _viewModel.send(NavigateToHomeDetail());
+                              _viewModel.send(StartButtonTapped());
                             },
                           ),
-                          homeButton(text: '설정하기', action: () {}),
+                          homeButton(
+                              text: '설정하기',
+                              action: () {
+                            _viewModel.send(SettingButtonTapped());
+                            }
+                          ),
                         ],
                       ),
                     ),
