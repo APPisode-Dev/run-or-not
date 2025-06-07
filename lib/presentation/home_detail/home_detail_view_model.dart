@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:run_or_not/presentation/core/const/app_assets.dart';
 import 'package:run_or_not/presentation/home_detail/home_detail_intent.dart';
 import 'package:run_or_not/presentation/home_detail/home_detail_state.dart';
 import 'package:run_or_not/presentation/router/app_screen.dart';

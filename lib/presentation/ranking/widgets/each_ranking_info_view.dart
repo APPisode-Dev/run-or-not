@@ -36,7 +36,7 @@ class EachRankingInfoView extends StatelessWidget {
               ),
               Expanded(
                 flex: 2,
-                child: _avatarView(),
+                child: _avatarView(customCharacter),
               ),
             ],
           ),
@@ -81,17 +81,16 @@ class EachRankingInfoView extends StatelessWidget {
     );
   }
 
-  Widget _avatarView() {
+  Widget _avatarView(CustomCharacter customCharacter) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
         child: Container(
           width: WidgetSizes.avatarCircleSize,
           height: WidgetSizes.avatarCircleSize,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.black, width: 1),
+          child: Image.asset(
+            customCharacter.assetName,
+            fit: BoxFit.contain,
           ),
         ),
       ),

@@ -21,14 +21,14 @@ void setupDependencies() {
 
   getIt.registerFactory<HomeViewModel>(() => HomeViewModel(getIt<RouterService>()));
   getIt.registerFactory<HomeDetailViewModel>(() => HomeDetailViewModel(getIt<RouterService>()));
-  getIt.registerFactoryParam<GamePlayViewModel, List<String>, void>(
+  getIt.registerFactoryParam<GamePlayViewModel, List<(String, String)>, void>(
     (characterTuples, _) => GamePlayViewModel(
         getIt<RouterService>(),
         characterTuples,
         getIt<GameUseCase>(),
     ),
   );
-  getIt.registerFactoryParam<RankingViewModel, List<(String, int)>, void>(
+  getIt.registerFactoryParam<RankingViewModel, List<(String, String, int)>, void>(
     (characterTuples, _) => RankingViewModel(
       getIt<RouterService>(),
       characterTuples,

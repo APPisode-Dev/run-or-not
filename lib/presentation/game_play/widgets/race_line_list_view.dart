@@ -52,28 +52,26 @@ class RaceLineListView extends StatelessWidget {
   }
 
   Widget _characterAvatarView(int index) {
-    return Selector<GamePlayViewModel, (double, bool)>(
+    return Selector<GamePlayViewModel, CustomCharacter>(
       selector: (context, viewModel) {
         final _character = viewModel.state.characterList[index];
-        return (_character.positionX, _character.isFinished);
+        return _character;
       },
-      builder: (context, tuple, _) {
-        final (_positionX, _isFinished) = tuple;
+      builder: (context, character, _) {
 
-        if (_isFinished) return const SizedBox.shrink();
+        if (character.isFinished) return const SizedBox.shrink();
 
         return AnimatedPositioned(
           duration: const Duration(milliseconds: 100),
-          left: _positionX.clamp(0, maxWidth),
+          left: character.positionX.clamp(0, maxWidth),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
             child: Container(
               width: WidgetSizes.avatarCircleSize,
               height: WidgetSizes.avatarCircleSize,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 1),
+              child: Image.asset(
+                character.assetName,
+                fit: BoxFit.contain,
               ),
             ),
           ),

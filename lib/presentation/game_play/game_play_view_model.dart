@@ -18,14 +18,16 @@ class GamePlayViewModel extends ChangeNotifier {
 
   GamePlayViewModel(
     this._routerService,
-    List<String> characterList,
+    List<(String, String)> characterTuples,
     this._gameUseCase,
   ): _state = GamePlayState(
-    characterList: characterList.map((character) {
-      final _name = character;
+    characterList: characterTuples.map((character) {
+      final _name = character.$1;
+      final _assetName = character.$2;
 
       return CustomCharacter(
         name: _name,
+        assetName: _assetName,
         speed: RandomUtil.getDoubleMinMaxRangeValue(3, 10),
         positionX: 0,
         isFinished: false,
@@ -57,7 +59,7 @@ class GamePlayViewModel extends ChangeNotifier {
         break;
       case RankingButtonTapped():
         final charactersTuples = _state.characterList.map((character) {
-          return (character.name, character.rank);
+          return (character.name, character.assetName, character.rank);
         }).toList();
         _routerService.navigateTo(AppScreen.ranking.path, extra: charactersTuples);
         break;
@@ -99,6 +101,7 @@ class GamePlayViewModel extends ChangeNotifier {
         final newCharacterList = current.characterList.map((character){
           return CustomCharacter(
             name: character.name,
+            assetName: character.assetName,
             speed: RandomUtil.getDoubleMinMaxRangeValue(5, 15),
             positionX: 0,
             isFinished: false,

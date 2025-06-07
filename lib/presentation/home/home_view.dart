@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:run_or_not/core/di/constant/app_assets.dart';
+import 'package:run_or_not/presentation/core/const/app_assets.dart';
 import 'package:run_or_not/design_system/button/custom_button.dart';
 import 'package:run_or_not/design_system/color/app_colors.dart';
 import 'package:run_or_not/design_system/text/custom_text_style.dart';
