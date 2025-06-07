@@ -26,10 +26,10 @@ class RouterServiceImpl implements RouterService {
 
   @override
   void goRoot() {
-    _replaceTo(AppScreen.home);
+    _navigateAndClearStack(AppScreen.home);
   }
 
-  void _replaceTo(AppScreen screen) {
+  void _navigateAndClearStack(AppScreen screen) {
     router.go(screen.path);
   }
 }
