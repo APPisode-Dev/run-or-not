@@ -20,36 +20,19 @@ class HomeViewModel extends ChangeNotifier {
     }
 
     switch (intent) {
-      case ChangeButtonTapped():
-        send(SetLoading(true));
-        await _load();
-        send(ChangeText("MVI Test~"));
-        send(SetLoading(false));
-        break;
-
-      case NavigateToHomeDetail():
+      case StartButtonTapped():
         _routerService.navigateTo(AppScreen.homeDetail.path);
         break;
-
-      default:
+      case SettingButtonTapped():
+        _routerService.navigateTo(AppScreen.setting.path);
         break;
     }
   }
 
   HomeState reduce(HomeState current, HomeIntent intent) {
     switch (intent) {
-      case ChangeText(:final value):
-        return current.copyWith(
-          message: value
-        );
-      case SetLoading(:final isLoading):
-        return current.copyWith(isLoading: isLoading);
       default:
         return current;
       }
-  }
-
-  Future<void> _load() async {
-    await Future.delayed(const Duration(seconds: 2));
   }
 }
