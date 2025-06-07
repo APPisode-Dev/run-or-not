@@ -4,6 +4,7 @@ import 'package:run_or_not/design_system/color/app_colors.dart';
 import 'package:run_or_not/design_system/text/custom_text_style.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
+import 'package:run_or_not/presentation/core/widgets/AvatarView.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
 
 class RaceLineListView extends StatelessWidget {
@@ -64,17 +65,7 @@ class RaceLineListView extends StatelessWidget {
         return AnimatedPositioned(
           duration: const Duration(milliseconds: 100),
           left: character.positionX.clamp(0, maxWidth),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-            child: Container(
-              width: WidgetSizes.avatarCircleSize,
-              height: WidgetSizes.avatarCircleSize,
-              child: Image.asset(
-                character.assetName,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
+          child: AvatarView(assetName: character.assetName),
         );
       },
     );
