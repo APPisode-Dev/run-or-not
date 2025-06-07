@@ -12,16 +12,16 @@ class RankingViewModel extends ChangeNotifier {
 
   RankingViewModel(
       this._routerService,
-      List<(String, int, int)> characterTuples,
+      List<(String, String, int)> characterTuples,
       ): _state = RankingState(
       characterList: _sortedCharacters(characterTuples),
   );
 
-  static List<CustomCharacter> _sortedCharacters(List<(String, int, int)> characterTuples) {
+  static List<CustomCharacter> _sortedCharacters(List<(String, String, int)> characterTuples) {
     final list = characterTuples.map((tuples) {
       return CustomCharacter(
         name: tuples.$1,
-        hexColor: tuples.$2,
+        assetName: tuples.$2,
         rank: tuples.$3,
       );
     }).toList();

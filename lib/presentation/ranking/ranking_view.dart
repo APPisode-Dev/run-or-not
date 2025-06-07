@@ -16,6 +16,7 @@ class RankingView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(Icons.home_outlined),

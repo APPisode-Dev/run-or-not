@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:run_or_not/presentation/game_play/game_play_intent.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
+import 'package:run_or_not/presentation/game_play/widgets/game_play_button.dart';
 import 'package:run_or_not/presentation/game_play/widgets/race_line_list_view.dart';
 
 class GamePlayView extends StatelessWidget {
@@ -22,55 +23,30 @@ class GamePlayView extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            _buttonRowView(
-              goBackButtonAction: () {
-                _viewModel.send(GoBackButtonTapped());
-              },
-              startButtonAction: () {
-                _viewModel.send(TimerStartButtonTapped());
-              },
-              rankingButtonAction: () {
-                _viewModel.send(RankingButtonTapped());
-              },
-            ),
             RaceLineListView(
               characters: _viewModel.state.characterList,
               maxWidth: _maxWidth,
-            )
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GamePlayButton(
+                goBackButtonAction: () {
+                  _viewModel.send(GoBackButtonTapped());
+                },
+                startButtonAction: () {
+                  _viewModel.send(StartButtonTapped());
+                },
+                rankingButtonAction: () {
+                  _viewModel.send(RankingButtonTapped());
+                },
+                retryButtonAction: () {
+                  _viewModel.send(RetryButtonTapped());
+                }
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  // TODO: 임시 버튼
-  Widget _buttonRowView({
-    required VoidCallback goBackButtonAction,
-    required VoidCallback startButtonAction,
-    required VoidCallback rankingButtonAction,
-  }) {
-    return Row(
-      children: [
-        ElevatedButton(
-          onPressed: goBackButtonAction,
-          child: const Text('Go Back'),
-        ),
-        ElevatedButton(
-          onPressed: startButtonAction,
-          child: const Text('timer start'),
-        ),
-        Selector<GamePlayViewModel, bool>(
-          selector: (context, viewModel) => viewModel.state.shouldShowRankingButton,
-          builder: (context, shouldShowRankingButton, _) {
-            return shouldShowRankingButton
-              ? ElevatedButton(
-                  onPressed: rankingButtonAction,
-                  child: const Text('Ranking View'),
-                )
-              : const SizedBox.shrink();
-          },
-        ),
-      ],
     );
   }
 }

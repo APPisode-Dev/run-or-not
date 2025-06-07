@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:run_or_not/design_system/color/app_colors.dart';
 import 'package:run_or_not/design_system/text/custom_text_style.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
+import 'package:run_or_not/presentation/core/widgets/avatar_view.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
 
 class RaceLineListView extends StatelessWidget {
@@ -23,6 +25,7 @@ class RaceLineListView extends StatelessWidget {
             characters.asMap().entries.map((entry) {
               final _index = entry.key;
               final _character = entry.value;
+              final _isEven = _index % 2 == 0;
 
               return Selector<GamePlayViewModel, bool>(
                 selector:
@@ -32,14 +35,11 @@ class RaceLineListView extends StatelessWidget {
                   return Container(
                     height: WidgetSizes.gamePlayContainerHeight,
                     decoration: BoxDecoration(
-                      color: Color(
-                        _character.hexColor,
-                      ).withValues(alpha: isFinished ? 0.5 : 1.0),
-                      borderRadius: BorderRadius.circular(8),
+                      color: _getLineBackgroundColor(_isEven, isFinished),
                     ),
                     child: Stack(
                       children: [
-                        _characterAvatarView(_index),
+                        _characterAvatarView(_index, _character.assetName),
                         _characterNameView(_character.name),
                         _rankView(_index),
                       ],
@@ -52,7 +52,7 @@ class RaceLineListView extends StatelessWidget {
     );
   }
 
-  Widget _characterAvatarView(int index) {
+  Widget _characterAvatarView(int index, String assetName) {
     return Selector<GamePlayViewModel, (double, bool)>(
       selector: (context, viewModel) {
         final _character = viewModel.state.characterList[index];
@@ -60,24 +60,12 @@ class RaceLineListView extends StatelessWidget {
       },
       builder: (context, tuple, _) {
         final (_positionX, _isFinished) = tuple;
-
         if (_isFinished) return const SizedBox.shrink();
 
         return AnimatedPositioned(
           duration: const Duration(milliseconds: 100),
           left: _positionX.clamp(0, maxWidth),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-            child: Container(
-              width: WidgetSizes.avatarCircleSize,
-              height: WidgetSizes.avatarCircleSize,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 1),
-              ),
-            ),
-          ),
+          child: AvatarView(assetName: assetName),
         );
       },
     );
@@ -89,7 +77,7 @@ class RaceLineListView extends StatelessWidget {
       right: 10,
       child: Text(
         name,
-        style: CustomTextStyle.bodySmall.copyWith(color: Colors.white),
+        style: CustomTextStyle.bodySmall.copyWith(color: Colors.black),
       ),
     );
   }
@@ -110,5 +98,17 @@ class RaceLineListView extends StatelessWidget {
             : const SizedBox.shrink();
       },
     );
+  }
+
+  Color _getLineBackgroundColor(bool isEven, bool isFinished) {
+    if (isFinished) {
+      return AppColors.peach;
+    } else {
+      if (isEven) {
+        return Colors.transparent;
+      } else {
+        return AppColors.paleLemon.withValues(alpha: 0.5);
+      }
+    }
   }
 }
