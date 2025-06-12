@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:run_or_not/presentation/core/const/app_assets.dart';
 import 'package:run_or_not/presentation/home_detail/home_detail_intent.dart';
@@ -22,25 +23,27 @@ class HomeDetailViewModel extends ChangeNotifier {
 
     switch (intent) {
       case NavigateToGamePlay():
-        if (_state.canStartGame) {
-          final characterTuples =
-              _state.characterNames
-                  .asMap()
-                  .entries
-                  .where((entry) => entry.value.trim().isNotEmpty)
-                  .map((entry) {
-                    final index = entry.key;
-                    final name = entry.value;
-                    final imagePath = _state.characterImages[index];
-                    return (name, imagePath);
-                  })
-                  .toList();
+        if (!_state.canStartGame) return;
 
-          _routerService.navigateTo(
-            AppScreen.gamePlay.path,
-            extra: characterTuples,
-          );
-        }
+        final namesForGame =
+            _state.characterNames.asMap().entries.map((entry) {
+              final index = entry.key;
+              final name = entry.value;
+              return name.trim().isEmpty
+                  ? '${index + 1}'
+                  : name; // 현재는 index 만 표시 추후에 detail 하게 수정 될 예정
+            }).toList();
+
+        final characterTuples =
+            namesForGame.asMap().entries.map((entry) {
+              final imagePath = _state.characterImages[entry.key];
+              return (entry.value, imagePath);
+            }).toList();
+
+        _routerService.navigateTo(
+          AppScreen.gamePlay.path,
+          extra: characterTuples,
+        );
         break;
       default:
         break;
@@ -54,8 +57,7 @@ class HomeDetailViewModel extends ChangeNotifier {
           final newNames = [...current.characterNames];
           final newImages = [...current.characterImages];
 
-          final newIndex = newNames.length + 1;
-          newNames.add('$newIndex');
+          newNames.add('');
 
           final imageIndex = newImages.length % _availableImages.length;
           newImages.add(_availableImages[imageIndex]);
@@ -67,6 +69,31 @@ class HomeDetailViewModel extends ChangeNotifier {
         }
         return current;
 
+      case SetCharacterCount(:final count):
+        final currentCount = current.characterCount;
+        if (count == currentCount) return current;
+
+        final newNames = List<String>.from(current.characterNames);
+        final newImages = List<String>.from(current.characterImages);
+
+        if (count > currentCount) {
+          for (int i = 0; i < count - currentCount; i++) {
+            newNames.add('');
+            newImages.add(
+              _availableImages[newImages.length % _availableImages.length],
+            );
+          }
+        } else {
+          for (int i = 0; i < currentCount - count; i++) {
+            newNames.removeLast();
+            newImages.removeLast();
+          }
+        }
+        return current.copyWith(
+          characterNames: newNames,
+          characterImages: newImages,
+        );
+
       case RemoveCharacter(:final index):
         if (current.canRemoveCharacter &&
             index >= 0 &&
@@ -76,6 +103,21 @@ class HomeDetailViewModel extends ChangeNotifier {
 
           newNames.removeAt(index);
           newImages.removeAt(index);
+
+          return current.copyWith(
+            characterNames: newNames,
+            characterImages: newImages,
+          );
+        }
+        return current;
+
+      case RemoveLastCharacter():
+        if (current.canRemoveCharacter) {
+          final newNames = [...current.characterNames];
+          final newImages = [...current.characterImages];
+
+          newNames.removeLast();
+          newImages.removeLast();
 
           return current.copyWith(
             characterNames: newNames,
