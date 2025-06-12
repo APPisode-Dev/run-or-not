@@ -10,6 +10,13 @@ class RemoveCharacter extends HomeDetailIntent {
   RemoveCharacter(this.index);
 }
 
+class SetCharacterCount extends HomeDetailIntent {
+  final int count;
+  SetCharacterCount(this.count);
+}
+
+class RemoveLastCharacter extends HomeDetailIntent {}
+
 class UpdateCharacterName extends HomeDetailIntent {
   final int index;
   final String name;
@@ -22,4 +29,10 @@ class UpdateCharacterImage extends HomeDetailIntent {
   final String imagePath;
 
   UpdateCharacterImage(this.index, this.imagePath);
+}
+
+class CharacterImageTapped extends HomeDetailIntent {
+  final int index;
+
+  CharacterImageTapped(this.index);
 }
