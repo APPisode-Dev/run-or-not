@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:run_or_not/presentation/core/const/app_assets.dart';
 
 class HomeDetailState {
@@ -22,19 +21,9 @@ class HomeDetailState {
 
   int get characterCount => characterNames.length;
 
-  bool get canRemoveCharacter => characterNames.length > 2;
+  bool get canRemoveCharacter => characterCount > 2;
 
-  bool get canAddCharacter => characterNames.length < 99;
+  bool get canAddCharacter => characterCount < 99;
 
   bool get canStartGame => characterCount >= 2;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is HomeDetailState &&
-          runtimeType == other.runtimeType &&
-          listEquals(characterNames, other.characterNames) &&
-          listEquals(characterImages, other.characterImages));
-  @override
-  int get hashCode => Object.hash(characterNames, characterImages);
 }
