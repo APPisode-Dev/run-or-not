@@ -25,20 +25,13 @@ class HomeDetailViewModel extends ChangeNotifier {
       case NavigateToGamePlay():
         if (!_state.canStartGame) return;
 
-        final namesForGame =
-            _state.characterNames.asMap().entries.map((entry) {
-              final index = entry.key;
-              final name = entry.value;
-              return name.trim().isEmpty
-                  ? '${index + 1}'
-                  : name; // 현재는 index 만 표시 추후에 detail 하게 수정 될 예정
-            }).toList();
-
-        final characterTuples =
-            namesForGame.asMap().entries.map((entry) {
-              final imagePath = _state.characterImages[entry.key];
-              return (entry.value, imagePath);
-            }).toList();
+        final characterTuples = List.generate(_state.characterNames.length, (
+          index,
+        ) {
+          final name = _state.characterNames[index].trim();
+          final image = _state.characterImages[index];
+          return (name.isEmpty ? '${index + 1}' : name, image);
+        });
 
         _routerService.navigateTo(
           AppScreen.gamePlay.path,
