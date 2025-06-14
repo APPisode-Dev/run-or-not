@@ -6,7 +6,7 @@ class HomeDetailState {
 
   const HomeDetailState({
     this.characterNames = const ['', ''],
-    this.characterImages = const [AppAssets.horseYellow, AppAssets.horseYellow],
+    this.characterImages = const [AppAssets.horseYellow, AppAssets.horseGreen],
   });
 
   HomeDetailState copyWith({
