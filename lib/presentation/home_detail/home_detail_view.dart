@@ -24,10 +24,10 @@ class HomeDetailView extends StatelessWidget {
 
     final characterStepper = Selector<HomeDetailViewModel, (int, bool, bool)>(
       selector:
-          (context, vm) => (
-            vm.state.characterCount,
-            vm.state.canAddCharacter,
-            vm.state.canRemoveCharacter,
+          (context, viewModel) => (
+            viewModel.state.characterCount,
+            viewModel.state.canAddCharacter,
+            viewModel.state.canRemoveCharacter,
           ),
       builder: (context, data, _) {
         final (characterCount, canAdd, canRemove) = data;
@@ -50,14 +50,15 @@ class HomeDetailView extends StatelessWidget {
     );
 
     final characterGrid =
-        Selector<HomeDetailViewModel, (List<String>, List<String>)>(
+        Selector<HomeDetailViewModel, (List<String>, List<String>, bool)>(
           selector:
-              (context, vm) => (
-                vm.state.characterNames,
-                vm.state.characterImages,
+              (context, viewModel) => (
+                viewModel.state.characterNames,
+                viewModel.state.characterImages,
+                viewModel.state.canRemoveCharacter,
               ),
           builder: (context, data, _) {
-            final (characterNames, characterImages) = data;
+            final (characterNames, characterImages, canRemove) = data;
             return GridView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -79,6 +80,12 @@ class HomeDetailView extends StatelessWidget {
                   onImageTap: (index) {
                     // TODO: 향후 SideEffect 패턴 등으로 개선
                   },
+                  onRemove:
+                      canRemove
+                          ? () => context.read<HomeDetailViewModel>().send(
+                            RemoveCharacter(index),
+                          )
+                          : null,
                 );
               },
             );
@@ -86,7 +93,7 @@ class HomeDetailView extends StatelessWidget {
         );
 
     final startGameButton = Selector<HomeDetailViewModel, bool>(
-      selector: (context, vm) => vm.state.canStartGame,
+      selector: (context, viewModel) => viewModel.state.canStartGame,
       builder: (context, canStartGame, _) {
         return StartGameButton(
           canStartGame: canStartGame,
