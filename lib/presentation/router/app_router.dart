@@ -21,7 +21,7 @@ GoRouter createRouter() {
         path: AppScreen.home.path,
         builder: (context, state) {
           return ChangeNotifierProvider(
-            create: (_) => getIt<HomeViewModel>() ,
+            create: (_) => getIt<HomeViewModel>(),
             child: HomeView(),
           );
         },
@@ -30,7 +30,7 @@ GoRouter createRouter() {
         path: AppScreen.homeDetail.path,
         builder: (context, state) {
           return ChangeNotifierProvider(
-            create: (_) => getIt<HomeDetailViewModel>() ,
+            create: (_) => getIt<HomeDetailViewModel>(),
             child: HomeDetailView(),
           );
         },
@@ -44,7 +44,7 @@ GoRouter createRouter() {
             create: (_) => getIt<GamePlayViewModel>(param1: characterTuples),
             child: GamePlayView(),
           );
-        }
+        },
       ),
       GoRoute(
         path: AppScreen.ranking.path,
@@ -52,16 +52,16 @@ GoRouter createRouter() {
           final characterTuples = state.extra as List<(String, String, int)>;
 
           return ChangeNotifierProvider(
-            create: (_) => getIt<RankingViewModel>(param1: characterTuples) ,
+            create: (_) => getIt<RankingViewModel>(param1: characterTuples),
             child: RankingView(),
           );
-        }
+        },
       ),
       GoRoute(
         path: AppScreen.setting.path,
         builder: (context, state) {
           return ChangeNotifierProvider(
-            create: (_) => getIt<SettingViewModel>() ,
+            create: (_) => getIt<SettingViewModel>(),
             child: SettingView(),
           );
         },
