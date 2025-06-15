@@ -65,6 +65,7 @@ class GamePlayViewModel extends ChangeNotifier {
         _routerService.navigateTo(AppScreen.ranking.path, extra: charactersTuples);
         break;
       case StartButtonTapped():
+        send(SetGameStart(true));
         _timer?.cancel();
 
         _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
@@ -73,6 +74,7 @@ class GamePlayViewModel extends ChangeNotifier {
           bool _isAllPlayerFinish = _state.characterList.every((character) => character.isFinished);
           if (_isAllPlayerFinish) {
             _timerDispose();
+            send(SetGameStart(false));
           }
         });
         break;
@@ -112,6 +114,10 @@ class GamePlayViewModel extends ChangeNotifier {
         return current.copyWith(
           characterList: newCharacterList
         );
+    case SetGameStart(:final isStart):
+      return current.copyWith(
+          isStarting: isStart
+      );
       default:
         return current;
     }

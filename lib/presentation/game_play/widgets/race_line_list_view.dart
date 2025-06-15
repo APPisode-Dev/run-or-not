@@ -74,7 +74,7 @@ class RaceLineListView extends StatelessWidget {
   Widget _characterNameView(String name) {
     return Positioned(
       top: 2,
-      right: 10,
+      right: 6,
       child: Text(
         name,
         style: CustomTextStyle.bodySmall.copyWith(color: Colors.black),
@@ -91,9 +91,12 @@ class RaceLineListView extends StatelessWidget {
       builder: (context, tuple, _) {
         final (_isFinished, _rank) = tuple;
         return (_isFinished && _rank != null)
-            ? Text(
-              "$_rank등",
-              style: CustomTextStyle.bodySmall.copyWith(color: Colors.black),
+            ? Padding(
+              padding: const EdgeInsets.fromLTRB(6, 2, 0, 0),
+              child: Text(
+                "$_rank등",
+                style: CustomTextStyle.bodySmall.copyWith(color: Colors.black),
+              ),
             )
             : const SizedBox.shrink();
       },
