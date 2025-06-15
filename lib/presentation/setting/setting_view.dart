@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:run_or_not/presentation/setting/setting_view_model.dart';
 
 class SettingView extends StatelessWidget {
-  const SettingView({super.key});
+  final SettingViewModel settingViewModel;
+
+  const SettingView({super.key, required this.settingViewModel});
 
   @override
   Widget build(BuildContext context) {

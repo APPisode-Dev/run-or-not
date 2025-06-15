@@ -20,18 +20,20 @@ GoRouter createRouter() {
       GoRoute(
         path: AppScreen.home.path,
         builder: (context, state) {
+          final homeViewModel = getIt<HomeViewModel>();
           return ChangeNotifierProvider(
-            create: (_) => getIt<HomeViewModel>(),
-            child: HomeView(),
+            create: (_) => homeViewModel,
+            child: HomeView(homeViewModel: homeViewModel),
           );
         },
       ),
       GoRoute(
         path: AppScreen.homeDetail.path,
         builder: (context, state) {
+          final detailViewModel = getIt<HomeDetailViewModel>();
           return ChangeNotifierProvider(
-            create: (_) => getIt<HomeDetailViewModel>(),
-            child: HomeDetailView(),
+            create: (_) => detailViewModel,
+            child: HomeDetailView(detailViewModel: detailViewModel),
           );
         },
       ),
@@ -39,10 +41,11 @@ GoRouter createRouter() {
         path: AppScreen.gamePlay.path,
         builder: (context, state) {
           final characterTuples = state.extra as List<(String, String)>;
+          final gamePlayViewModel = getIt<GamePlayViewModel>(param1: characterTuples);
 
           return ChangeNotifierProvider(
-            create: (_) => getIt<GamePlayViewModel>(param1: characterTuples),
-            child: GamePlayView(),
+            create: (_) => gamePlayViewModel,
+            child: GamePlayView(gamePlayViewModel: gamePlayViewModel),
           );
         },
       ),
@@ -50,19 +53,21 @@ GoRouter createRouter() {
         path: AppScreen.ranking.path,
         builder: (context, state) {
           final characterTuples = state.extra as List<(String, String, int)>;
+          final rankingViewModel = getIt<RankingViewModel>(param1: characterTuples);
 
           return ChangeNotifierProvider(
-            create: (_) => getIt<RankingViewModel>(param1: characterTuples),
-            child: RankingView(),
+            create: (_) => rankingViewModel,
+            child: RankingView(rankingViewModel: rankingViewModel),
           );
         },
       ),
       GoRoute(
         path: AppScreen.setting.path,
         builder: (context, state) {
+          final settingViewModel = getIt<SettingViewModel>();
           return ChangeNotifierProvider(
-            create: (_) => getIt<SettingViewModel>(),
-            child: SettingView(),
+            create: (_) => settingViewModel,
+            child: SettingView(settingViewModel: settingViewModel),
           );
         },
       ),
