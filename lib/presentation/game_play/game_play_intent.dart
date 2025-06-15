@@ -11,3 +11,8 @@ class UpdateMaxDeviceWidthAndSafeArea extends GamePlayIntent {
 
   UpdateMaxDeviceWidthAndSafeArea(this.maxDeviceWidth, this.horizontalSafeArea);
 }
+class SetGameStart extends GamePlayIntent {
+  final bool isStart;
+
+  SetGameStart(this.isStart);
+}

@@ -21,6 +21,28 @@ class GamePlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Selector<GamePlayViewModel, bool>(
+        selector:
+            (context, viewModel) => viewModel.state.isStarting,
+        builder: (context, isStart, _) {
+          return isStart
+              ? const SizedBox.shrink()
+              : _gamePlayButtonBody();
+        }
+    );
+  }
+
+  Widget _buttonView(VoidCallback action, String title) {
+    return CustomButton(
+      child: Text(title, style: CustomTextStyle.bodySmall),
+      faceColor: AppColors.peach,
+      borderRadius: 15,
+      onPressed: action,
+      childPadding: EdgeInsets.fromLTRB(8, 4, 8, 4),
+    );
+  }
+
+  Widget _gamePlayButtonBody() {
     return Row(
       children: [
         Expanded(
@@ -31,7 +53,7 @@ class GamePlayButton extends StatelessWidget {
             child: Selector<GamePlayViewModel, bool>(
               selector:
                   (context, viewModel) =>
-                      viewModel.state.shouldShowRankingButton,
+              viewModel.state.shouldShowRankingButton,
               builder: (context, shouldShowRankingButton, _) {
                 return shouldShowRankingButton
                     ? _buttonView(retryButtonAction, "다시 하기")
@@ -46,24 +68,14 @@ class GamePlayButton extends StatelessWidget {
           builder: (context, shouldShowRankingButton, _) {
             return shouldShowRankingButton
                 ? Expanded(
-                  child: Center(
-                    child: _buttonView(rankingButtonAction, "순위 보기"),
-                  ),
-                )
+              child: Center(
+                child: _buttonView(rankingButtonAction, "순위 보기"),
+              ),
+            )
                 : const SizedBox.shrink();
           },
         ),
       ],
-    );
-  }
-
-  Widget _buttonView(VoidCallback action, String title) {
-    return CustomButton(
-      child: Text(title, style: CustomTextStyle.bodySmall),
-      faceColor: AppColors.peach,
-      borderRadius: 15,
-      onPressed: action,
-      childPadding: EdgeInsets.fromLTRB(8, 4, 8, 4),
     );
   }
 }
