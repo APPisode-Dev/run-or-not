@@ -1,15 +1,29 @@
+import 'package:run_or_not/presentation/core/const/app_assets.dart';
+
 class HomeDetailState {
-  final bool isLoading;
+  final List<String> characterNames;
+  final List<String> characterImages;
 
   const HomeDetailState({
-    this.isLoading = false,
+    this.characterNames = const ['', ''],
+    this.characterImages = const [AppAssets.horseYellow, AppAssets.horseGreen],
   });
 
   HomeDetailState copyWith({
-    bool? isLoading,
+    List<String>? characterNames,
+    List<String>? characterImages,
   }) {
     return HomeDetailState(
-      isLoading: isLoading ?? this.isLoading,
+      characterNames: characterNames ?? this.characterNames,
+      characterImages: characterImages ?? this.characterImages,
     );
   }
+
+  int get characterCount => characterNames.length;
+
+  bool get canRemoveCharacter => characterCount > 2;
+
+  bool get canAddCharacter => characterCount < 99;
+
+  bool get canStartGame => characterCount >= 2;
 }
