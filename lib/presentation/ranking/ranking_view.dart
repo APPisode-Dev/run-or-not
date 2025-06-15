@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:run_or_not/design_system/color/app_colors.dart';
 import 'package:run_or_not/design_system/text/custom_text_style.dart';
 import 'package:run_or_not/presentation/ranking/ranking_intent.dart';
@@ -8,12 +7,12 @@ import 'package:run_or_not/presentation/ranking/widgets/each_ranking_info_view.d
 import 'package:run_or_not/presentation/ranking/widgets/ranking_title_view.dart';
 
 class RankingView extends StatelessWidget {
-  const RankingView({super.key});
+  final RankingViewModel rankingViewModel;
+
+  const RankingView({super.key, required this.rankingViewModel});
 
   @override
   Widget build(BuildContext context) {
-    final _viewModel = context.read<RankingViewModel>();
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -21,7 +20,7 @@ class RankingView extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.home_outlined),
             onPressed: () {
-              _viewModel.send(HomeButtonTapped());
+              rankingViewModel.send(HomeButtonTapped());
             },
           ),
         ],
@@ -36,7 +35,7 @@ class RankingView extends StatelessWidget {
           RankingTitleView(),
           Expanded(
               child: ListView(
-                children: _viewModel.state.characterList
+                children: rankingViewModel.state.characterList
                     .asMap()
                     .entries
                     .map ((entry) {

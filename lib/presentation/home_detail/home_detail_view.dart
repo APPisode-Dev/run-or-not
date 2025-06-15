@@ -9,7 +9,9 @@ import 'package:run_or_not/presentation/home_detail/widgets/character_count_step
 import 'package:run_or_not/presentation/home_detail/widgets/start_game_button.dart';
 
 class HomeDetailView extends StatelessWidget {
-  const HomeDetailView({super.key});
+  final HomeDetailViewModel detailViewModel;
+
+  const HomeDetailView({super.key, required this.detailViewModel});
 
   @override
   Widget build(BuildContext context) {
@@ -35,16 +37,9 @@ class HomeDetailView extends StatelessWidget {
           characterCount: characterCount,
           canAddCharacter: canAdd,
           canRemoveCharacter: canRemove,
-          onAddCharacter:
-              () => context.read<HomeDetailViewModel>().send(AddCharacter()),
-          onRemoveCharacter:
-              () => context.read<HomeDetailViewModel>().send(
-                RemoveLastCharacter(),
-              ),
-          onCountChanged:
-              (newCount) => context.read<HomeDetailViewModel>().send(
-                SetCharacterCount(newCount),
-              ),
+          onAddCharacter: () => detailViewModel.send(AddCharacter()),
+          onRemoveCharacter: () => detailViewModel.send(RemoveLastCharacter()),
+          onCountChanged: (newCount) => detailViewModel.send(SetCharacterCount(newCount)),
         );
       },
     );
@@ -74,17 +69,13 @@ class HomeDetailView extends StatelessWidget {
                   currentName: characterNames[index],
                   imagePath: characterImages[index],
                   onNameChanged:
-                      (index, name) => context.read<HomeDetailViewModel>().send(
-                        UpdateCharacterName(index, name),
-                      ),
+                      (index, name) => detailViewModel.send(UpdateCharacterName(index, name)),
                   onImageTap: (index) {
                     // TODO: 향후 SideEffect 패턴 등으로 개선
                   },
                   onRemove:
                       canRemove
-                          ? () => context.read<HomeDetailViewModel>().send(
-                            RemoveCharacter(index),
-                          )
+                          ? () => detailViewModel.send(RemoveCharacter(index))
                           : null,
                 );
               },
@@ -97,10 +88,7 @@ class HomeDetailView extends StatelessWidget {
       builder: (context, canStartGame, _) {
         return StartGameButton(
           canStartGame: canStartGame,
-          onStartGame:
-              () => context.read<HomeDetailViewModel>().send(
-                NavigateToGamePlay(),
-              ),
+          onStartGame: () => detailViewModel.send(NavigateToGamePlay()),
         );
       },
     );

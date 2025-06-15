@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:run_or_not/presentation/game_play/game_play_intent.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
 import 'package:run_or_not/presentation/game_play/widgets/game_play_button.dart';
 import 'package:run_or_not/presentation/game_play/widgets/race_line_list_view.dart';
 
 class GamePlayView extends StatelessWidget {
-  const GamePlayView({super.key});
+  final GamePlayViewModel gamePlayViewModel;
+  
+  const GamePlayView({super.key, required this.gamePlayViewModel});
 
   @override
   Widget build(BuildContext context) {
-    final _viewModel = context.read<GamePlayViewModel>();
     final _mediaQuery = MediaQuery.of(context);
     final _maxWidth = _mediaQuery.size.width;
     final _horizontalSafeArea = _mediaQuery.padding.left + _mediaQuery.padding.right;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _viewModel.send(UpdateMaxDeviceWidthAndSafeArea(_maxWidth, _horizontalSafeArea));
+      gamePlayViewModel.send(UpdateMaxDeviceWidthAndSafeArea(_maxWidth, _horizontalSafeArea));
     });
 
     return Scaffold(
@@ -24,23 +24,23 @@ class GamePlayView extends StatelessWidget {
         child: Column(
           children: [
             RaceLineListView(
-              characters: _viewModel.state.characterList,
+              characters: gamePlayViewModel.state.characterList,
               maxWidth: _maxWidth,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: GamePlayButton(
                 goBackButtonAction: () {
-                  _viewModel.send(GoBackButtonTapped());
+                  gamePlayViewModel.send(GoBackButtonTapped());
                 },
                 startButtonAction: () {
-                  _viewModel.send(StartButtonTapped());
+                  gamePlayViewModel.send(StartButtonTapped());
                 },
                 rankingButtonAction: () {
-                  _viewModel.send(RankingButtonTapped());
+                  gamePlayViewModel.send(RankingButtonTapped());
                 },
                 retryButtonAction: () {
-                  _viewModel.send(RetryButtonTapped());
+                  gamePlayViewModel.send(RetryButtonTapped());
                 }
               ),
             ),

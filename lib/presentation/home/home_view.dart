@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:run_or_not/presentation/core/const/app_assets.dart';
 import 'package:run_or_not/design_system/button/custom_button.dart';
 import 'package:run_or_not/design_system/color/app_colors.dart';
@@ -9,11 +8,12 @@ import 'home_intent.dart';
 import 'home_view_model.dart';
 
 class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+  final HomeViewModel homeViewModel;
+
+  const HomeView({super.key, required this.homeViewModel});
 
   @override
   Widget build(BuildContext context) {
-    final _viewModel = context.read<HomeViewModel>();
     final screenHeight = MediaQuery.of(context).size.height;
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
@@ -57,13 +57,13 @@ class HomeView extends StatelessWidget {
                           homeButton(
                             text: '시작하기',
                             action: () {
-                              _viewModel.send(StartButtonTapped());
+                              homeViewModel.send(StartButtonTapped());
                             },
                           ),
                           homeButton(
                               text: '설정하기',
                               action: () {
-                            _viewModel.send(SettingButtonTapped());
+                                homeViewModel.send(SettingButtonTapped());
                             }
                           ),
                         ],
