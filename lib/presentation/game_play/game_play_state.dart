@@ -7,23 +7,26 @@ class GamePlayState {
   bool get shouldShowRankingButton {
     return characterList.every((character) => character.isFinished);
   }
+  bool isStarting;
 
   GamePlayState({
     required this.characterList,
     this.maxDeviceWidth = 376,
     this.horizontalSafeArea = 0,
+    this.isStarting = false,
   });
 
   GamePlayState copyWith({
     List<CustomCharacter>? characterList,
     double? maxDeviceWidth,
     double? horizontalSafeArea,
-    bool? isRankingButtonVisible,
+    bool? isStarting,
   }) {
     return GamePlayState(
       characterList: characterList ?? this.characterList,
       maxDeviceWidth: maxDeviceWidth ?? this.maxDeviceWidth,
       horizontalSafeArea: horizontalSafeArea ?? this.horizontalSafeArea,
+      isStarting: isStarting ?? this.isStarting,
     );
   }
 }
