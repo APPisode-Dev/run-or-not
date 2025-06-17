@@ -4,8 +4,8 @@ import 'package:run_or_not/design_system/color/app_colors.dart';
 import 'package:run_or_not/design_system/text/custom_text_style.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
-import 'package:run_or_not/presentation/core/widgets/avatar_view.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
+import 'package:run_or_not/presentation/game_play/widgets/rive_character.dart';
 
 class RaceLineListView extends StatelessWidget {
   final List<CustomCharacter> characters;
@@ -52,20 +52,23 @@ class RaceLineListView extends StatelessWidget {
     );
   }
 
-  Widget _characterAvatarView(int index, String assetName) {
-    return Selector<GamePlayViewModel, (double, bool)>(
+  Widget _characterAvatarView(int index, String assetPath) {
+    return Selector<GamePlayViewModel, (double, bool, bool)>(
       selector: (context, viewModel) {
         final _character = viewModel.state.characterList[index];
-        return (_character.positionX, _character.isFinished);
+        return (_character.positionX, _character.isFinished, viewModel.state.isStarting);
       },
       builder: (context, tuple, _) {
-        final (_positionX, _isFinished) = tuple;
+        final (_positionX, _isFinished, isStart) = tuple;
         if (_isFinished) return const SizedBox.shrink();
 
         return AnimatedPositioned(
           duration: const Duration(milliseconds: 100),
           left: _positionX.clamp(0, maxWidth),
-          child: AvatarView(assetName: assetName),
+          child: RiveCharacter(
+            assetPath: assetPath,
+            isRunning: isStart,
+          ),
         );
       },
     );
