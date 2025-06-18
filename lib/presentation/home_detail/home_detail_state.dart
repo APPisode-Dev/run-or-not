@@ -3,19 +3,23 @@ import 'package:run_or_not/presentation/core/const/app_assets.dart';
 class HomeDetailState {
   final List<String> characterNames;
   final List<String> characterImages;
+  final AlertCase? alertCase;
 
   const HomeDetailState({
     this.characterNames = const ['', ''],
-    this.characterImages = const [AppAssets.horseYellow, AppAssets.horseGreen],
+    this.characterImages = const [AppAssets.horseYellow, AppAssets.horseBlue],
+    this.alertCase,
   });
 
   HomeDetailState copyWith({
     List<String>? characterNames,
     List<String>? characterImages,
+    AlertCase? alertCase,
   }) {
     return HomeDetailState(
       characterNames: characterNames ?? this.characterNames,
       characterImages: characterImages ?? this.characterImages,
+      alertCase: alertCase,
     );
   }
 
@@ -26,4 +30,11 @@ class HomeDetailState {
   bool get canAddCharacter => characterCount < 99;
 
   bool get canStartGame => characterCount >= 2;
+}
+
+sealed class AlertCase {}
+class SelectCharacterAlert extends AlertCase {
+  final int index;
+
+  SelectCharacterAlert(this.index);
 }

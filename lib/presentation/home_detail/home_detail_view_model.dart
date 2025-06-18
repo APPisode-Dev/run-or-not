@@ -135,6 +135,11 @@ class HomeDetailViewModel extends ChangeNotifier {
         }
         return current;
 
+      case CharacterImageTapped(:final index):
+        return current.copyWith(alertCase: SelectCharacterAlert(index));
+
+      case DismissAlert():
+        return current.copyWith(alertCase: null);
       default:
         return current;
     }
