@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 import 'package:run_or_not/domain/use_case/game/game_use_case.dart';
 import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
-import 'package:run_or_not/presentation/game_play/const/game_play_const.dart';
+import 'package:run_or_not/domain/const/character_random_min_max.dart';
 import 'package:run_or_not/presentation/game_play/game_play_intent.dart';
 import 'package:run_or_not/presentation/game_play/game_play_state.dart';
-import 'package:run_or_not/presentation/game_play/utils/random_util.dart';
+import 'package:run_or_not/core/utils/random_util.dart';
 import 'package:run_or_not/presentation/router/app_screen.dart';
 import 'package:run_or_not/presentation/router/service/router_service.dart';
 
@@ -29,7 +29,7 @@ class GamePlayViewModel extends ChangeNotifier {
       return CustomCharacter(
         name: _name,
         assetName: _assetName,
-        speed: RandomUtil.getDoubleMinMaxRangeValue(GamePlayConst.randomMin, GamePlayConst.randomMax),
+        speed: RandomUtil.getDoubleMinMaxRangeValue(CharacterRandomMinMax.randomMin, CharacterRandomMinMax.randomMax),
         positionX: 0,
         isFinished: false,
       );
@@ -105,7 +105,7 @@ class GamePlayViewModel extends ChangeNotifier {
           return CustomCharacter(
             name: character.name,
             assetName: character.assetName,
-            speed: RandomUtil.getDoubleMinMaxRangeValue(GamePlayConst.randomMin, GamePlayConst.randomMax),
+            speed: RandomUtil.getDoubleMinMaxRangeValue(CharacterRandomMinMax.randomMin, CharacterRandomMinMax.randomMax),
             positionX: 0,
             isFinished: false,
           );

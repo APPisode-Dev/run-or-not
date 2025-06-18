@@ -1,6 +1,13 @@
+import 'dart:math';
+
+import 'package:run_or_not/core/utils/random_util.dart';
+import 'package:run_or_not/domain/const/character_random_min_max.dart';
+import 'package:run_or_not/domain/const/game_probability.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
 
 class GameUseCase {
+  final Random _random = Random();
+
   List<CustomCharacter> moveCharactersAndAssignRanks(
     double avatarSize,
     double maxDeviceWidth,
@@ -33,8 +40,11 @@ class GameUseCase {
         return character.copyWith(isFinished: true);
       }
 
+      double newSpeed = _boostRandomSpeedWithChaos(character.speed);
+
       return character.copyWith(
-        positionX: character.positionX + character.speed,
+        positionX: character.positionX + newSpeed,
+        speed: _changeSpeedRandomlyEachCheckPoint(character.speed, character.positionX),
       );
     }).toList();
   }
@@ -58,5 +68,28 @@ class GameUseCase {
         }).toList();
 
     return _rankedList;
+  }
+
+  double _boostRandomSpeedWithChaos(double originalSpeed) {
+    if (_random.nextDouble() < GameProbability.boostSpeedWithChaos) {
+      double newSpeed = originalSpeed * (2 + _random.nextDouble() * 3);
+      if (_random.nextBool()) {
+        newSpeed *= -1;
+      }
+
+      return newSpeed;
+    } else {
+      return originalSpeed;
+    }
+  }
+
+  double _changeSpeedRandomlyEachCheckPoint(double speed, double positionX) {
+    int checkpoint = 100;
+
+    if ((positionX ~/ checkpoint) != (positionX + speed) ~/ checkpoint) {
+      return RandomUtil.getDoubleMinMaxRangeValue(CharacterRandomMinMax.randomMin, CharacterRandomMinMax.randomMax);
+    } else {
+      return speed;
+    }
   }
 }
