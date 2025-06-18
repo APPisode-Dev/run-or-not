@@ -36,3 +36,5 @@ class CharacterImageTapped extends HomeDetailIntent {
 
   CharacterImageTapped(this.index);
 }
+
+class DismissAlert extends HomeDetailIntent {}
