@@ -9,6 +9,7 @@ import 'home_view_model.dart';
 
 class HomeView extends StatelessWidget {
   final HomeViewModel homeViewModel;
+  final isSettingButtonVisible = false;
 
   const HomeView({super.key, required this.homeViewModel});
 
@@ -60,12 +61,13 @@ class HomeView extends StatelessWidget {
                               homeViewModel.send(StartButtonTapped());
                             },
                           ),
-                          homeButton(
-                              text: '설정하기',
-                              action: () {
-                                homeViewModel.send(SettingButtonTapped());
-                            }
-                          ),
+                          if (isSettingButtonVisible)
+                            homeButton(
+                                text: '설정하기',
+                                action: () {
+                                  homeViewModel.send(SettingButtonTapped());
+                              }
+                            ),
                         ],
                       ),
                     ),
