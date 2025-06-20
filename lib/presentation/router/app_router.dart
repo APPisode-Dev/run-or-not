@@ -31,8 +31,8 @@ GoRouter createRouter() {
         path: AppScreen.homeDetail.path,
         builder: (context, state) {
           final detailViewModel = getIt<HomeDetailViewModel>();
-          return ChangeNotifierProvider(
-            create: (_) => detailViewModel,
+          return ChangeNotifierProvider.value(
+            value: detailViewModel,
             child: HomeDetailView(detailViewModel: detailViewModel),
           );
         },
