@@ -20,7 +20,7 @@ void setupDependencies() {
   getIt.registerLazySingleton<GameUseCase>(() => GameUseCase());
 
   getIt.registerFactory<HomeViewModel>(() => HomeViewModel(getIt<RouterService>()));
-  getIt.registerFactory<HomeDetailViewModel>(() => HomeDetailViewModel(getIt<RouterService>()));
+  getIt.registerLazySingleton<HomeDetailViewModel>(() => HomeDetailViewModel(getIt<RouterService>()));
   getIt.registerFactoryParam<GamePlayViewModel, List<(String, String)>, void>(
     (characterTuples, _) => GamePlayViewModel(
         getIt<RouterService>(),
