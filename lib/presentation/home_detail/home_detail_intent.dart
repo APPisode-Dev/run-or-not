@@ -38,3 +38,4 @@ class CharacterImageTapped extends HomeDetailIntent {
 }
 
 class DismissAlert extends HomeDetailIntent {}
+class ReplaceHomeDetailRouter extends HomeDetailIntent {}
