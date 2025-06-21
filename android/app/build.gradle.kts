@@ -9,7 +9,7 @@ plugins {
 }
 
 // MARK: 키스토어 properties 불러오기
-val keystorePropertiesFile = rootProject.file("android/app/key.properties")
+val keystorePropertiesFile = file("key.properties")
 val keystoreProperties = Properties().apply {
     load(FileInputStream(keystorePropertiesFile))
 }
@@ -51,7 +51,6 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
         }
     }
