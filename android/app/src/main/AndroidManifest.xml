@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="run_or_not"
+        android:label="달릴까말까"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
