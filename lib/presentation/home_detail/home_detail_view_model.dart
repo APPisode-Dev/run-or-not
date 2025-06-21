@@ -38,6 +38,9 @@ class HomeDetailViewModel extends ChangeNotifier {
           extra: characterTuples,
         );
         break;
+      case ReplaceHomeDetailRouter():
+        _routerService.replace(AppScreen.homeDetail.path);
+        break;
       default:
         break;
     }
@@ -140,9 +143,16 @@ class HomeDetailViewModel extends ChangeNotifier {
 
       case DismissAlert():
         return current.copyWith(alertCase: null);
+      case ReplaceHomeDetailRouter():
+        return current.copyWith(hasReplaceRouter: true);
       default:
         return current;
     }
+  }
+
+  void resetViewModel() {
+    _state = const HomeDetailState();
+    notifyListeners();
   }
 
   static const List<String> _availableImages = [

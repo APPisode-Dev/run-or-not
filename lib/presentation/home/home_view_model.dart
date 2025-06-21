@@ -21,7 +21,8 @@ class HomeViewModel extends ChangeNotifier {
 
     switch (intent) {
       case StartButtonTapped():
-        _routerService.navigateTo(AppScreen.homeDetail.path);
+        final homeDetailPathWithParameter = "${AppScreen.homeDetail.path}?reset=true";
+        _routerService.navigateTo(homeDetailPathWithParameter);
         break;
       case SettingButtonTapped():
         _routerService.navigateTo(AppScreen.setting.path);

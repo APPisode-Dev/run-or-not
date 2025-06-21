@@ -31,6 +31,12 @@ GoRouter createRouter() {
         path: AppScreen.homeDetail.path,
         builder: (context, state) {
           final detailViewModel = getIt<HomeDetailViewModel>();
+          final resetFlag = state.uri.queryParameters['reset'];
+          final shouldReset = resetFlag == 'true';
+          if (shouldReset) {
+            detailViewModel.resetViewModel();
+          }
+
           return ChangeNotifierProvider.value(
             value: detailViewModel,
             child: HomeDetailView(detailViewModel: detailViewModel),

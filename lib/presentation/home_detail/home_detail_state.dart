@@ -4,22 +4,26 @@ class HomeDetailState {
   final List<String> characterNames;
   final List<String> characterImages;
   final AlertCase? alertCase;
+  final bool hasReplaceRouter;
 
   const HomeDetailState({
     this.characterNames = const ['', ''],
     this.characterImages = const [AppAssets.horseYellow, AppAssets.horseBlue],
     this.alertCase,
+    this.hasReplaceRouter = false,
   });
 
   HomeDetailState copyWith({
     List<String>? characterNames,
     List<String>? characterImages,
     AlertCase? alertCase,
+    bool? hasReplaceRouter,
   }) {
     return HomeDetailState(
       characterNames: characterNames ?? this.characterNames,
       characterImages: characterImages ?? this.characterImages,
       alertCase: alertCase,
+      hasReplaceRouter: hasReplaceRouter ?? this.hasReplaceRouter,
     );
   }
 

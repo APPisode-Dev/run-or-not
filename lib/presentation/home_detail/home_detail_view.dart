@@ -20,6 +20,12 @@ class HomeDetailView extends StatelessWidget {
     final orientation = MediaQuery.of(context).orientation;
     final isPortrait = orientation == Orientation.portrait;
 
+    if (!detailViewModel.state.hasReplaceRouter) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        detailViewModel.send(ReplaceHomeDetailRouter());
+      });
+    }
+
     final _appBar = AppBar(
       title: Text(
         "캐릭터 이름 설정",

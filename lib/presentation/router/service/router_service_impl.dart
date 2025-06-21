@@ -32,4 +32,9 @@ class RouterServiceImpl implements RouterService {
   void _navigateAndClearStack(AppScreen screen) {
     router.go(screen.path);
   }
+
+  @override
+  void replace(String path, {Object? extra}) {
+    router.replace(path, extra: extra);
+  }
 }
