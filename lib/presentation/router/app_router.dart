@@ -43,8 +43,8 @@ GoRouter createRouter() {
           final characterTuples = state.extra as List<(String, String)>;
           final gamePlayViewModel = getIt<GamePlayViewModel>(param1: characterTuples);
 
-          return ChangeNotifierProvider(
-            create: (_) => gamePlayViewModel,
+          return ChangeNotifierProvider.value(
+            value: gamePlayViewModel,
             child: GamePlayView(gamePlayViewModel: gamePlayViewModel),
           );
         },
