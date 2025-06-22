@@ -39,11 +39,16 @@ class HomeDetailView extends StatelessWidget {
 
     return Stack(
       children: [
-        Scaffold(
-          resizeToAvoidBottomInset: true,
-          backgroundColor: AppColors.paleLemon,
-          appBar: _appBar,
-          body: _homeDetailBody(isPortrait: isPortrait),
+        GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            backgroundColor: AppColors.paleLemon,
+            appBar: _appBar,
+            body: _homeDetailBody(isPortrait: isPortrait),
+          ),
         ),
         _alertView(),
       ],
@@ -148,6 +153,7 @@ class HomeDetailView extends StatelessWidget {
                   (index, name) =>
                       detailViewModel.send(UpdateCharacterName(index, name)),
               onImageTap: (index) {
+                FocusScope.of(context).unfocus();
                 detailViewModel.send(CharacterImageTapped(index));
               },
               onRemove:
