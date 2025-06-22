@@ -75,16 +75,31 @@ class HomeDetailView extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: 250,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _titleText(),
-                        const SizedBox(height: 32),
-                        _characterStepper(),
-                        const Spacer(),
-                        _startGameButton(),
-                        const SizedBox(height: 16),
-                      ],
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                            child: IntrinsicHeight(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _titleText(),
+                                  const Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+                                    child: _characterStepper(),
+                                  ),
+                                  const Spacer(),
+                                  _startGameButton(),
+                                  const SizedBox(height: 16),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }
                     ),
                   ),
                   const SizedBox(width: 16),
