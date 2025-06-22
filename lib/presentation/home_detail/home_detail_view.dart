@@ -40,7 +40,7 @@ class HomeDetailView extends StatelessWidget {
     return Stack(
       children: [
         Scaffold(
-          resizeToAvoidBottomInset: false,
+          resizeToAvoidBottomInset: true,
           backgroundColor: AppColors.paleLemon,
           appBar: _appBar,
           body: _homeDetailBody(isPortrait: isPortrait),
