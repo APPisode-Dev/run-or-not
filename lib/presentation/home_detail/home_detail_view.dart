@@ -39,11 +39,16 @@ class HomeDetailView extends StatelessWidget {
 
     return Stack(
       children: [
-        Scaffold(
-          resizeToAvoidBottomInset: false,
-          backgroundColor: AppColors.paleLemon,
-          appBar: _appBar,
-          body: _homeDetailBody(isPortrait: isPortrait),
+        GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            backgroundColor: AppColors.paleLemon,
+            appBar: _appBar,
+            body: _homeDetailBody(isPortrait: isPortrait),
+          ),
         ),
         _alertView(),
       ],
@@ -53,39 +58,9 @@ class HomeDetailView extends StatelessWidget {
   Widget _homeDetailBody({required bool isPortrait}) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child:
-          isPortrait
-              ? Column(
-                children: [
-                  _titleText(),
-                  const SizedBox(height: 32),
-                  _characterStepper(),
-                  const SizedBox(height: 16),
-                  Expanded(child: _characterGridView(isPortrait)),
-                  const SizedBox(height: 24),
-                  _startGameButton(),
-                ],
-              )
-              : Row(
-                children: [
-                  SizedBox(
-                    width: 250,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _titleText(),
-                        const SizedBox(height: 32),
-                        _characterStepper(),
-                        const Spacer(),
-                        _startGameButton(),
-                        const SizedBox(height: 16),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(child: _characterGridView(isPortrait)),
-                ],
-              ),
+      child: isPortrait
+          ? _portraitBody()
+          : _landscapeBody()
     );
   }
 
@@ -148,6 +123,7 @@ class HomeDetailView extends StatelessWidget {
                   (index, name) =>
                       detailViewModel.send(UpdateCharacterName(index, name)),
               onImageTap: (index) {
+                FocusScope.of(context).unfocus();
                 detailViewModel.send(CharacterImageTapped(index));
               },
               onRemove:
@@ -201,6 +177,62 @@ class HomeDetailView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+extension HomeDetailPortraitBody on HomeDetailView {
+  Widget _portraitBody() {
+    return Column(
+      children: [
+        _titleText(),
+        const SizedBox(height: 32),
+        _characterStepper(),
+        const SizedBox(height: 16),
+        Expanded(child: _characterGridView(true)),
+        const SizedBox(height: 24),
+        _startGameButton(),
+      ],
+    );
+  }
+}
+
+extension HomeDetailLandscapeBody on HomeDetailView {
+  Widget _landscapeBody() {
+    return Row(
+      children: [
+        SizedBox(
+          width: 250,
+          child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _titleText(),
+                          const Spacer(),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+                            child: _characterStepper(),
+                          ),
+                          const Spacer(),
+                          _startGameButton(),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(child: _characterGridView(false)),
+      ],
     );
   }
 }
