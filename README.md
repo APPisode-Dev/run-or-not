@@ -1,22 +1,8 @@
 # 🐴 달릴까말까
 
-가벼운 내기, 예측 불가 레이스! '달릴까말까' 지금 시작해보세요!
+가벼운 내기, 예측 불가 레이스! '달릴까말까' 지금 시작해보세요!  
 
-<br>
-
-### 🔗 스토어 링크
-
-- [App Store](https://apps.apple.com/kr/app/%EB%8B%AC%EB%A6%B4%EA%B9%8C%EB%A7%90%EA%B9%8C/id6747607216)  
-- [Play Store](https://play.google.com/store/apps/details?id=com.appisode.run_or_not)  
-
-<br>
-
-### 🧑🏻‍💻 팀원
-
-- [Jumy's Github](https://github.com/kdjun97)
-- [Ujun's Github](https://github.com/MentalJava)
-
-<br>
+<br>  
 
 ### ✏️ 간단한 프로젝트 소개
 
@@ -27,6 +13,13 @@
 > 커피 내기, 점심 메뉴 정하기처럼 가벼운 결정이 필요할 땐 ‘달릴까말까’로 재미있고 빠르게 정해보세요!
 
 <br>
+
+### 🔗 스토어 링크  
+
+- [App Store](https://apps.apple.com/kr/app/%EB%8B%AC%EB%A6%B4%EA%B9%8C%EB%A7%90%EA%B9%8C/id6747607216)  
+- [Play Store](https://play.google.com/store/apps/details?id=com.appisode.run_or_not)  
+
+<br> 
 
 ### 🛠️ 앱 개발에 사용한 기술 및 환경
 
@@ -55,8 +48,16 @@
 
 <br>
 
+### 🧑🏻‍💻 팀원
+
+- [Jumy's Github](https://github.com/kdjun97)
+- [Ujun's Github](https://github.com/MentalJava)
+
+<br>
+
 ### 🌴 Git Flow
 
+```mermaid
 %%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': {'mainBranchName': 'master'}} }%%
 gitGraph
   commit id: "master init"
@@ -94,3 +95,4 @@ gitGraph
   merge "hotfix-2.0.1" tag: "v2.0.1"
   checkout development
   merge "hotfix-2.0.1"
+```
