@@ -10,6 +10,10 @@ platform :android do
     package_name = ENV.fetch("ANDROID_PACKAGE_NAME", "com.appisode.run_or_not")
     track = ENV.fetch("ANDROID_TRACK", "internal")
     deployment_tag = ENV.fetch("ANDROID_DEPLOY_TAG")
+    changes_not_sent_for_review = ENV.fetch(
+      "ANDROID_CHANGES_NOT_SENT_FOR_REVIEW",
+      "true"
+    ) == "true"
     pubspec_path = File.join(project_root, "pubspec.yaml")
     aab_path = File.join(
       project_root,
@@ -23,6 +27,7 @@ platform :android do
     UI.message("Package: #{package_name}")
     UI.message("Track: #{track}")
     UI.message("Deployment tag: #{deployment_tag}")
+    UI.message("Changes not sent for review: #{changes_not_sent_for_review}")
 
     UI.user_error!("pubspec.yaml was not found: #{pubspec_path}") unless File.exist?(pubspec_path)
 
@@ -80,17 +85,25 @@ platform :android do
     UI.user_error!("Android App Bundle was not generated: #{aab_path}") unless File.exist?(aab_path)
     UI.message("Generated AAB: #{aab_path} (#{File.size(aab_path)} bytes)")
 
-    upload_to_play_store(
-      json_key: json_key,
-      package_name: package_name,
-      aab: aab_path,
-      track: track,
-      release_status: ENV.fetch("ANDROID_RELEASE_STATUS", "draft"),
-      skip_upload_metadata: true,
-      skip_upload_changelogs: true,
-      skip_upload_images: true,
-      skip_upload_screenshots: true
-    )
+    begin
+      upload_to_play_store(
+        json_key: json_key,
+        package_name: package_name,
+        aab: aab_path,
+        track: track,
+        release_status: ENV.fetch("ANDROID_RELEASE_STATUS", "draft"),
+        changes_not_sent_for_review: changes_not_sent_for_review,
+        rescue_changes_not_sent_for_review: true,
+        skip_upload_metadata: true,
+        skip_upload_changelogs: true,
+        skip_upload_images: true,
+        skip_upload_screenshots: true
+      )
+    rescue => error
+      UI.error("Google Play upload failed: #{error.class}: #{error.message}")
+      UI.error(error.full_message(highlight: false, order: :top))
+      raise
+    end
   end
 end
 
