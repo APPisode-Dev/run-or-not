@@ -55,6 +55,17 @@
 
 <br>
 
+### 🚀 iOS CI/CD
+
+iOS 배포 태그 형식: `ios/<version>+<build-number>-<YYMMDDHHMM>`
+
+```bash
+git tag -a "ios/1.0.2+10-2608192212" -m "iOS 1.0.2+10"
+git push origin "ios/1.0.2+10-2608192212"
+```
+
+<br>
+
 ### 🌴 Git Flow
 
 ```mermaid

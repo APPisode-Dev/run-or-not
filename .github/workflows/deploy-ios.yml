@@ -3,7 +3,7 @@ name: Deploy iOS
 on:
   push:
     tags:
-      - "ios-v*"
+      - "ios/*"
 
 concurrency:
   group: deploy-ios
@@ -73,6 +73,10 @@ jobs:
           test -f lib/app/main.dart && echo "lib/app/main.dart=found" || { echo "lib/app/main.dart=missing"; exit 1; }
           test -f ios/Podfile && echo "ios/Podfile=found" || { echo "ios/Podfile=missing"; exit 1; }
           test -f ios/Podfile.lock && echo "ios/Podfile.lock=found" || { echo "ios/Podfile.lock=missing"; exit 1; }
+          test -f ios/Runner/Info.plist && echo "ios/Runner/Info.plist=found" || { echo "ios/Runner/Info.plist=missing"; exit 1; }
+          EXPORT_COMPLIANCE_VALUE="$(plutil -extract ITSAppUsesNonExemptEncryption raw -o - ios/Runner/Info.plist)"
+          test "$EXPORT_COMPLIANCE_VALUE" = "false" || { echo "ITSAppUsesNonExemptEncryption must be false"; exit 1; }
+          echo "ITSAppUsesNonExemptEncryption=$EXPORT_COMPLIANCE_VALUE"
           test -f ios/Runner.xcworkspace/contents.xcworkspacedata && echo "ios/Runner.xcworkspace=found" || { echo "ios/Runner.xcworkspace=missing"; exit 1; }
           security find-identity -v -p codesigning "$RUNNER_TEMP/app-signing.keychain-db"
           ruby --version

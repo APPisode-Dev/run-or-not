@@ -1,3 +1,5 @@
+require "time"
+
 opt_out_usage
 default_platform(:ios)
 
@@ -100,14 +102,30 @@ platform :ios do
     )
 
     deployment_tag_match = deployment_tag.match(
-      /\Aios-v(\d+\.\d+\.\d+)\+(\d+)\z/
+      /\Aios\/(\d+\.\d+\.\d+)\+(\d+)-(\d{10})\z/
     )
-    UI.user_error!("Invalid iOS deployment tag: #{deployment_tag}") unless deployment_tag_match
+    UI.user_error!(
+      "Invalid iOS deployment tag: #{deployment_tag}. " \
+      "Expected ios/<version>+<build>-<YYMMDDHHMM>"
+    ) unless deployment_tag_match
 
     tag_version = deployment_tag_match[1]
     tag_build_number = deployment_tag_match[2].to_i
+    tag_timestamp = deployment_tag_match[3]
+
+    UI.user_error!("iOS build number must be greater than 0: #{tag_build_number}") if tag_build_number <= 0
+
+    begin
+      parsed_tag_time = Time.strptime(tag_timestamp, "%y%m%d%H%M")
+      unless parsed_tag_time.strftime("%y%m%d%H%M") == tag_timestamp
+        UI.user_error!("Invalid iOS deployment tag timestamp: #{tag_timestamp}")
+      end
+    rescue ArgumentError
+      UI.user_error!("Invalid iOS deployment tag timestamp: #{tag_timestamp}")
+    end
 
     UI.message("Tag version: #{tag_version}+#{tag_build_number}")
+    UI.message("Tag timestamp: #{tag_timestamp}")
 
     bundle_id = ENV.fetch("IOS_BUNDLE_ID", "com.appisode.runOrNot")
 
