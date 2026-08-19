@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -52,6 +52,25 @@ jobs:
           keyPassword=$ANDROID_KEY_PASSWORD
           EOF
           echo "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64" | base64 --decode > google-play-service-account.json
+
+      - name: Inspect Android deployment context
+        shell: bash
+        run: |
+          echo "::group::Android deployment context"
+          echo "working_directory=$(pwd)"
+          echo "repository_root=$(git rev-parse --show-toplevel)"
+          echo "git_ref_name=$GITHUB_REF_NAME"
+          echo "git_sha=$GITHUB_SHA"
+          test -f pubspec.yaml && echo "pubspec.yaml=found" || { echo "pubspec.yaml=missing"; exit 1; }
+          grep '^version:' pubspec.yaml
+          test -f fastlane/Fastfile && echo "fastlane/Fastfile=found" || { echo "fastlane/Fastfile=missing"; exit 1; }
+          test -f lib/app/main.dart && echo "lib/app/main.dart=found" || { echo "lib/app/main.dart=missing"; exit 1; }
+          test -f google-play-service-account.json && echo "service_account_json=found" || { echo "service_account_json=missing"; exit 1; }
+          test -f android/app/release.jks && echo "release_keystore=found" || { echo "release_keystore=missing"; exit 1; }
+          ruby --version
+          bundle --version
+          flutter --version
+          echo "::endgroup::"
 
       - name: Deploy Android
         env:

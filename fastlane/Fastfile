@@ -1,19 +1,37 @@
 default_platform(:ios)
 
+project_root = File.expand_path("..", __dir__)
+
 platform :android do
   desc "Build and upload Android App Bundle to Google Play"
   lane :deploy do
     json_key = ENV.fetch("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH")
     package_name = ENV.fetch("ANDROID_PACKAGE_NAME", "com.appisode.run_or_not")
     track = ENV.fetch("ANDROID_TRACK", "internal")
+    pubspec_path = File.join(project_root, "pubspec.yaml")
+    aab_path = File.join(
+      project_root,
+      "build/app/outputs/bundle/release/app-release.aab"
+    )
 
-    pubspec_version_match = File.read("pubspec.yaml").match(
+    UI.header("Android deployment context")
+    UI.message("Lane working directory: #{Dir.pwd}")
+    UI.message("Project root: #{project_root}")
+    UI.message("pubspec.yaml: #{pubspec_path} (exists: #{File.exist?(pubspec_path)})")
+    UI.message("Package: #{package_name}")
+    UI.message("Track: #{track}")
+
+    UI.user_error!("pubspec.yaml was not found: #{pubspec_path}") unless File.exist?(pubspec_path)
+
+    pubspec_version_match = File.read(pubspec_path).match(
       /^version:\s*(\d+\.\d+\.\d+)\+(\d+)/
     )
-    UI.user_error!("pubspec.yaml version was not found") unless pubspec_version_match
+    UI.user_error!("pubspec.yaml version was not found: #{pubspec_path}") unless pubspec_version_match
 
     pubspec_version = pubspec_version_match[1]
     pubspec_build_number = pubspec_version_match[2].to_i
+    UI.message("pubspec version: #{pubspec_version}+#{pubspec_build_number}")
+
     play_store_version_codes = google_play_track_version_codes(
       json_key: json_key,
       package_name: package_name,
@@ -22,20 +40,26 @@ platform :android do
     latest_play_store_build_number = play_store_version_codes.max || 0
     next_build_number = [latest_play_store_build_number + 1, pubspec_build_number].max
 
-    UI.message("Building Android #{pubspec_version} (#{next_build_number})")
+    UI.message("Google Play version codes: #{play_store_version_codes.sort.join(", ")}")
+    UI.message("Latest Google Play build number: #{latest_play_store_build_number}")
+    UI.message("Selected Android build: #{pubspec_version}+#{next_build_number}")
 
     sh("flutter pub get")
     sh(
       "flutter build appbundle " \
       "--release " \
+      "--target=lib/app/main.dart " \
       "--build-name=#{pubspec_version} " \
       "--build-number=#{next_build_number}"
     )
 
+    UI.user_error!("Android App Bundle was not generated: #{aab_path}") unless File.exist?(aab_path)
+    UI.message("Generated AAB: #{aab_path} (#{File.size(aab_path)} bytes)")
+
     upload_to_play_store(
       json_key: json_key,
       package_name: package_name,
-      aab: "build/app/outputs/bundle/release/app-release.aab",
+      aab: aab_path,
       track: track,
       release_status: ENV.fetch("ANDROID_RELEASE_STATUS", "draft"),
       skip_upload_metadata: true,
@@ -57,8 +81,11 @@ platform :ios do
       in_house: false
     )
 
-    pubspec_version = File.read("pubspec.yaml")[/^version:\s*(\d+\.\d+\.\d+)/, 1]
-    UI.user_error!("pubspec.yaml version was not found") unless pubspec_version
+    pubspec_path = File.join(project_root, "pubspec.yaml")
+    UI.user_error!("pubspec.yaml was not found: #{pubspec_path}") unless File.exist?(pubspec_path)
+
+    pubspec_version = File.read(pubspec_path)[/^version:\s*(\d+\.\d+\.\d+)/, 1]
+    UI.user_error!("pubspec.yaml version was not found: #{pubspec_path}") unless pubspec_version
 
     bundle_id = ENV.fetch("IOS_BUNDLE_ID", "com.appisode.runOrNot")
     latest_build_number = latest_testflight_build_number(
@@ -80,7 +107,7 @@ platform :ios do
       code_sign_identity: "Apple Distribution"
     )
 
-    export_options_path = "ios/ExportOptions.ci.plist"
+    export_options_path = File.join(project_root, "ios/ExportOptions.ci.plist")
     File.write(export_options_path, <<~PLIST)
       <?xml version="1.0" encoding="UTF-8"?>
       <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -109,12 +136,13 @@ platform :ios do
     sh(
       "flutter build ipa " \
       "--release " \
+      "--target=lib/app/main.dart " \
       "--build-name=#{pubspec_version} " \
       "--build-number=#{next_build_number} " \
       "--export-options-plist=#{export_options_path}"
     )
 
-    ipa_path = Dir["build/ios/ipa/*.ipa"].first
+    ipa_path = Dir[File.join(project_root, "build/ios/ipa/*.ipa")].first
     UI.user_error!("IPA file was not generated") unless ipa_path
 
     upload_to_testflight(
