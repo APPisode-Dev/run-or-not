@@ -29,7 +29,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: "3.38.9"
           cache: true
 
       - name: Set up Ruby
@@ -72,6 +72,10 @@ jobs:
           ruby --version
           bundle --version
           flutter --version
+          java -version
+          echo "gradle_wrapper=$(sed -n 's|.*gradle-\([0-9.]*\)-.*|\1|p' android/gradle/wrapper/gradle-wrapper.properties)"
+          echo "android_gradle_plugin=$(sed -n 's/.*com.android.application.*version "\([^"]*\)".*/\1/p' android/settings.gradle.kts)"
+          echo "kotlin_gradle_plugin=$(sed -n 's/.*org.jetbrains.kotlin.android.*version "\([^"]*\)".*/\1/p' android/settings.gradle.kts)"
           echo "::endgroup::"
 
       - name: Deploy Android
