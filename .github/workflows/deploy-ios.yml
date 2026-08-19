@@ -91,4 +91,5 @@ jobs:
           IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
           IOS_BUNDLE_ID: com.appisode.runOrNot
           IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+          IOS_DEPLOY_TAG: ${{ github.ref_name }}
         run: bundle exec fastlane ios deploy

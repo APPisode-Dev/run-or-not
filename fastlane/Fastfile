@@ -100,6 +100,7 @@ platform :ios do
     pubspec_path = File.join(project_root, "pubspec.yaml")
     podfile_path = File.join(project_root, "ios/Podfile")
     xcode_project_path = File.join(project_root, "ios/Runner.xcodeproj")
+    deployment_tag = ENV.fetch("IOS_DEPLOY_TAG")
 
     UI.header("iOS deployment context")
     UI.message("Lane working directory: #{Dir.pwd}")
@@ -107,6 +108,7 @@ platform :ios do
     UI.message("pubspec.yaml: #{pubspec_path} (exists: #{File.exist?(pubspec_path)})")
     UI.message("Podfile: #{podfile_path} (exists: #{File.exist?(podfile_path)})")
     UI.message("Xcode project: #{xcode_project_path} (exists: #{File.exist?(xcode_project_path)})")
+    UI.message("Deployment tag: #{deployment_tag}")
 
     UI.user_error!("pubspec.yaml was not found: #{pubspec_path}") unless File.exist?(pubspec_path)
     UI.user_error!("Podfile was not found: #{podfile_path}") unless File.exist?(podfile_path)
@@ -120,19 +122,36 @@ platform :ios do
       in_house: false
     )
 
-    pubspec_version = File.read(pubspec_path)[/^version:\s*(\d+\.\d+\.\d+)/, 1]
-    UI.user_error!("pubspec.yaml version was not found: #{pubspec_path}") unless pubspec_version
+    deployment_tag_match = deployment_tag.match(
+      /\Aios-v(\d+\.\d+\.\d+)\+(\d+)\z/
+    )
+    UI.user_error!("Invalid iOS deployment tag: #{deployment_tag}") unless deployment_tag_match
+
+    pubspec_version_match = File.read(pubspec_path).match(
+      /^version:\s*(\d+\.\d+\.\d+)\+(\d+)/
+    )
+    UI.user_error!("pubspec.yaml version was not found: #{pubspec_path}") unless pubspec_version_match
+
+    pubspec_version = pubspec_version_match[1]
+    pubspec_build_number = pubspec_version_match[2].to_i
+    tag_version = deployment_tag_match[1]
+    tag_build_number = deployment_tag_match[2].to_i
+
+    UI.message("pubspec version: #{pubspec_version}+#{pubspec_build_number}")
+    UI.message("Tag version: #{tag_version}+#{tag_build_number}")
+
+    UI.user_error!(
+      "Tag version #{tag_version} does not match pubspec version #{pubspec_version}"
+    ) unless tag_version == pubspec_version
+
+    UI.user_error!(
+      "Tag build number #{tag_build_number} is lower than pubspec build number #{pubspec_build_number}"
+    ) if tag_build_number < pubspec_build_number
 
     bundle_id = ENV.fetch("IOS_BUNDLE_ID", "com.appisode.runOrNot")
-    latest_build_number = latest_testflight_build_number(
-      api_key: api_key,
-      app_identifier: bundle_id,
-      version: pubspec_version,
-      initial_build_number: 0
-    )
-    next_build_number = latest_build_number + 1
+    next_build_number = tag_build_number
 
-    UI.message("Building iOS #{pubspec_version} (#{next_build_number})")
+    UI.message("Selected iOS build: #{pubspec_version}+#{next_build_number}")
 
     update_code_signing_settings(
       use_automatic_signing: false,
