@@ -3,7 +3,7 @@ name: Deploy Android
 on:
   push:
     tags:
-      - "android-v*"
+      - "android/*"
 
 concurrency:
   group: deploy-android

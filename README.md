@@ -55,6 +55,17 @@
 
 <br>
 
+### 🚀 Android CI/CD
+
+Android 배포 태그 형식: `android/<version>+<build-number>-<YYMMDDHHMM>`
+
+```bash
+git tag -a "android/1.0.2+10-2608192212" -m "Android 1.0.2+10"
+git push origin "android/1.0.2+10-2608192212"
+```
+
+<br>
+
 ### 🚀 iOS CI/CD
 
 iOS 배포 태그 형식: `ios/<version>+<build-number>-<YYMMDDHHMM>`
