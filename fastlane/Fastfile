@@ -3,14 +3,40 @@ default_platform(:ios)
 platform :android do
   desc "Build and upload Android App Bundle to Google Play"
   lane :deploy do
+    json_key = ENV.fetch("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH")
+    package_name = ENV.fetch("ANDROID_PACKAGE_NAME", "com.appisode.run_or_not")
+    track = ENV.fetch("ANDROID_TRACK", "internal")
+
+    pubspec_version_match = File.read("pubspec.yaml").match(
+      /^version:\s*(\d+\.\d+\.\d+)\+(\d+)/
+    )
+    UI.user_error!("pubspec.yaml version was not found") unless pubspec_version_match
+
+    pubspec_version = pubspec_version_match[1]
+    pubspec_build_number = pubspec_version_match[2].to_i
+    play_store_version_codes = google_play_track_version_codes(
+      json_key: json_key,
+      package_name: package_name,
+      track: track
+    )
+    latest_play_store_build_number = play_store_version_codes.max || 0
+    next_build_number = [latest_play_store_build_number + 1, pubspec_build_number].max
+
+    UI.message("Building Android #{pubspec_version} (#{next_build_number})")
+
     sh("flutter pub get")
-    sh("flutter build appbundle --release")
+    sh(
+      "flutter build appbundle " \
+      "--release " \
+      "--build-name=#{pubspec_version} " \
+      "--build-number=#{next_build_number}"
+    )
 
     upload_to_play_store(
-      json_key: ENV.fetch("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH"),
-      package_name: ENV.fetch("ANDROID_PACKAGE_NAME", "com.appisode.run_or_not"),
+      json_key: json_key,
+      package_name: package_name,
       aab: "build/app/outputs/bundle/release/app-release.aab",
-      track: ENV.fetch("ANDROID_TRACK", "internal"),
+      track: track,
       release_status: ENV.fetch("ANDROID_RELEASE_STATUS", "draft"),
       skip_upload_metadata: true,
       skip_upload_changelogs: true,
@@ -30,6 +56,20 @@ platform :ios do
       is_key_content_base64: true,
       in_house: false
     )
+
+    pubspec_version = File.read("pubspec.yaml")[/^version:\s*(\d+\.\d+\.\d+)/, 1]
+    UI.user_error!("pubspec.yaml version was not found") unless pubspec_version
+
+    bundle_id = ENV.fetch("IOS_BUNDLE_ID", "com.appisode.runOrNot")
+    latest_build_number = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: bundle_id,
+      version: pubspec_version,
+      initial_build_number: 0
+    )
+    next_build_number = latest_build_number + 1
+
+    UI.message("Building iOS #{pubspec_version} (#{next_build_number})")
 
     update_code_signing_settings(
       use_automatic_signing: false,
@@ -54,7 +94,7 @@ platform :ios do
         <string>#{ENV.fetch("IOS_TEAM_ID")}</string>
         <key>provisioningProfiles</key>
         <dict>
-          <key>#{ENV.fetch("IOS_BUNDLE_ID", "com.appisode.runOrNot")}</key>
+          <key>#{bundle_id}</key>
           <string>#{ENV.fetch("IOS_PROVISIONING_PROFILE_NAME")}</string>
         </dict>
         <key>uploadBitcode</key>
@@ -66,7 +106,13 @@ platform :ios do
     PLIST
 
     sh("flutter pub get")
-    sh("flutter build ipa --release --export-options-plist=#{export_options_path}")
+    sh(
+      "flutter build ipa " \
+      "--release " \
+      "--build-name=#{pubspec_version} " \
+      "--build-number=#{next_build_number} " \
+      "--export-options-plist=#{export_options_path}"
+    )
 
     ipa_path = Dir["build/ios/ipa/*.ipa"].first
     UI.user_error!("IPA file was not generated") unless ipa_path

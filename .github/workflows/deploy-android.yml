@@ -5,6 +5,10 @@ on:
     tags:
       - "android-v*"
 
+concurrency:
+  group: deploy-android
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
