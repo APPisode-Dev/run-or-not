@@ -14,7 +14,6 @@ platform :android do
       "ANDROID_CHANGES_NOT_SENT_FOR_REVIEW",
       "true"
     ) == "true"
-    pubspec_path = File.join(project_root, "pubspec.yaml")
     aab_path = File.join(
       project_root,
       "build/app/outputs/bundle/release/app-release.aab"
@@ -23,63 +22,28 @@ platform :android do
     UI.header("Android deployment context")
     UI.message("Lane working directory: #{Dir.pwd}")
     UI.message("Project root: #{project_root}")
-    UI.message("pubspec.yaml: #{pubspec_path} (exists: #{File.exist?(pubspec_path)})")
     UI.message("Package: #{package_name}")
     UI.message("Track: #{track}")
     UI.message("Deployment tag: #{deployment_tag}")
     UI.message("Changes not sent for review: #{changes_not_sent_for_review}")
-
-    UI.user_error!("pubspec.yaml was not found: #{pubspec_path}") unless File.exist?(pubspec_path)
 
     deployment_tag_match = deployment_tag.match(
       /\Aandroid-v(\d+\.\d+\.\d+)\+(\d+)\z/
     )
     UI.user_error!("Invalid Android deployment tag: #{deployment_tag}") unless deployment_tag_match
 
-    pubspec_version_match = File.read(pubspec_path).match(
-      /^version:\s*(\d+\.\d+\.\d+)\+(\d+)/
-    )
-    UI.user_error!("pubspec.yaml version was not found: #{pubspec_path}") unless pubspec_version_match
-
-    pubspec_version = pubspec_version_match[1]
-    pubspec_build_number = pubspec_version_match[2].to_i
     tag_version = deployment_tag_match[1]
     tag_build_number = deployment_tag_match[2].to_i
-    UI.message("pubspec version: #{pubspec_version}+#{pubspec_build_number}")
     UI.message("Tag version: #{tag_version}+#{tag_build_number}")
-
-    UI.user_error!(
-      "Tag version #{tag_version} does not match pubspec version #{pubspec_version}"
-    ) unless tag_version == pubspec_version
-
-    UI.user_error!(
-      "Tag build number #{tag_build_number} is lower than pubspec build number #{pubspec_build_number}"
-    ) if tag_build_number < pubspec_build_number
-
-    play_store_version_codes = google_play_track_version_codes(
-      json_key: json_key,
-      package_name: package_name,
-      track: track
-    )
-    latest_play_store_build_number = play_store_version_codes.max || 0
-
-    UI.user_error!(
-      "Tag build number #{tag_build_number} must be greater than Google Play build number #{latest_play_store_build_number}"
-    ) if tag_build_number <= latest_play_store_build_number
-
-    next_build_number = tag_build_number
-
-    UI.message("Google Play version codes: #{play_store_version_codes.sort.join(", ")}")
-    UI.message("Latest Google Play build number: #{latest_play_store_build_number}")
-    UI.message("Selected Android build: #{pubspec_version}+#{next_build_number}")
+    UI.message("Selected Android build: #{tag_version}+#{tag_build_number}")
 
     sh("flutter pub get")
     sh(
       "flutter build appbundle " \
       "--release " \
       "--target=lib/app/main.dart " \
-      "--build-name=#{pubspec_version} " \
-      "--build-number=#{next_build_number}"
+      "--build-name=#{tag_version} " \
+      "--build-number=#{tag_build_number}"
     )
 
     UI.user_error!("Android App Bundle was not generated: #{aab_path}") unless File.exist?(aab_path)
