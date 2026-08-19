@@ -1,3 +1,4 @@
+opt_out_usage
 default_platform(:ios)
 
 project_root = File.expand_path("..", __dir__)
@@ -8,6 +9,7 @@ platform :android do
     json_key = ENV.fetch("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH")
     package_name = ENV.fetch("ANDROID_PACKAGE_NAME", "com.appisode.run_or_not")
     track = ENV.fetch("ANDROID_TRACK", "internal")
+    deployment_tag = ENV.fetch("ANDROID_DEPLOY_TAG")
     pubspec_path = File.join(project_root, "pubspec.yaml")
     aab_path = File.join(
       project_root,
@@ -20,8 +22,14 @@ platform :android do
     UI.message("pubspec.yaml: #{pubspec_path} (exists: #{File.exist?(pubspec_path)})")
     UI.message("Package: #{package_name}")
     UI.message("Track: #{track}")
+    UI.message("Deployment tag: #{deployment_tag}")
 
     UI.user_error!("pubspec.yaml was not found: #{pubspec_path}") unless File.exist?(pubspec_path)
+
+    deployment_tag_match = deployment_tag.match(
+      /\Aandroid-v(\d+\.\d+\.\d+)\+(\d+)\z/
+    )
+    UI.user_error!("Invalid Android deployment tag: #{deployment_tag}") unless deployment_tag_match
 
     pubspec_version_match = File.read(pubspec_path).match(
       /^version:\s*(\d+\.\d+\.\d+)\+(\d+)/
@@ -30,7 +38,18 @@ platform :android do
 
     pubspec_version = pubspec_version_match[1]
     pubspec_build_number = pubspec_version_match[2].to_i
+    tag_version = deployment_tag_match[1]
+    tag_build_number = deployment_tag_match[2].to_i
     UI.message("pubspec version: #{pubspec_version}+#{pubspec_build_number}")
+    UI.message("Tag version: #{tag_version}+#{tag_build_number}")
+
+    UI.user_error!(
+      "Tag version #{tag_version} does not match pubspec version #{pubspec_version}"
+    ) unless tag_version == pubspec_version
+
+    UI.user_error!(
+      "Tag build number #{tag_build_number} is lower than pubspec build number #{pubspec_build_number}"
+    ) if tag_build_number < pubspec_build_number
 
     play_store_version_codes = google_play_track_version_codes(
       json_key: json_key,
@@ -38,7 +57,12 @@ platform :android do
       track: track
     )
     latest_play_store_build_number = play_store_version_codes.max || 0
-    next_build_number = [latest_play_store_build_number + 1, pubspec_build_number].max
+
+    UI.user_error!(
+      "Tag build number #{tag_build_number} must be greater than Google Play build number #{latest_play_store_build_number}"
+    ) if tag_build_number <= latest_play_store_build_number
+
+    next_build_number = tag_build_number
 
     UI.message("Google Play version codes: #{play_store_version_codes.sort.join(", ")}")
     UI.message("Latest Google Play build number: #{latest_play_store_build_number}")
@@ -73,6 +97,21 @@ end
 platform :ios do
   desc "Build and upload iOS IPA to TestFlight"
   lane :deploy do
+    pubspec_path = File.join(project_root, "pubspec.yaml")
+    podfile_path = File.join(project_root, "ios/Podfile")
+    xcode_project_path = File.join(project_root, "ios/Runner.xcodeproj")
+
+    UI.header("iOS deployment context")
+    UI.message("Lane working directory: #{Dir.pwd}")
+    UI.message("Project root: #{project_root}")
+    UI.message("pubspec.yaml: #{pubspec_path} (exists: #{File.exist?(pubspec_path)})")
+    UI.message("Podfile: #{podfile_path} (exists: #{File.exist?(podfile_path)})")
+    UI.message("Xcode project: #{xcode_project_path} (exists: #{File.exist?(xcode_project_path)})")
+
+    UI.user_error!("pubspec.yaml was not found: #{pubspec_path}") unless File.exist?(pubspec_path)
+    UI.user_error!("Podfile was not found: #{podfile_path}") unless File.exist?(podfile_path)
+    UI.user_error!("Xcode project was not found: #{xcode_project_path}") unless File.exist?(xcode_project_path)
+
     api_key = app_store_connect_api_key(
       key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
       issuer_id: ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
@@ -80,9 +119,6 @@ platform :ios do
       is_key_content_base64: true,
       in_house: false
     )
-
-    pubspec_path = File.join(project_root, "pubspec.yaml")
-    UI.user_error!("pubspec.yaml was not found: #{pubspec_path}") unless File.exist?(pubspec_path)
 
     pubspec_version = File.read(pubspec_path)[/^version:\s*(\d+\.\d+\.\d+)/, 1]
     UI.user_error!("pubspec.yaml version was not found: #{pubspec_path}") unless pubspec_version
@@ -100,7 +136,7 @@ platform :ios do
 
     update_code_signing_settings(
       use_automatic_signing: false,
-      path: "ios/Runner.xcodeproj",
+      path: xcode_project_path,
       team_id: ENV.fetch("IOS_TEAM_ID"),
       targets: ["Runner"],
       profile_name: ENV.fetch("IOS_PROVISIONING_PROFILE_NAME"),
@@ -132,15 +168,23 @@ platform :ios do
       </plist>
     PLIST
 
-    sh("flutter pub get")
-    sh(
-      "flutter build ipa " \
-      "--release " \
-      "--target=lib/app/main.dart " \
-      "--build-name=#{pubspec_version} " \
-      "--build-number=#{next_build_number} " \
-      "--export-options-plist=#{export_options_path}"
-    )
+    Dir.chdir(project_root) do
+      UI.message("Installing Flutter packages from: #{Dir.pwd}")
+      sh("flutter pub get")
+
+      UI.message("Installing CocoaPods dependencies with Bundler")
+      sh("bundle exec pod install --project-directory=ios")
+
+      UI.message("Building IPA from: #{Dir.pwd}")
+      sh(
+        "flutter build ipa " \
+        "--release " \
+        "--target=lib/app/main.dart " \
+        "--build-name=#{pubspec_version} " \
+        "--build-number=#{next_build_number} " \
+        "--export-options-plist=#{export_options_path}"
+      )
+    end
 
     ipa_path = Dir[File.join(project_root, "build/ios/ipa/*.ipa")].first
     UI.user_error!("IPA file was not generated") unless ipa_path

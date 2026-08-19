@@ -13,6 +13,8 @@ jobs:
   deploy:
     runs-on: macos-latest
     timeout-minutes: 45
+    env:
+      FASTLANE_OPT_OUT_USAGE: "true"
 
     steps:
       - name: Checkout
@@ -50,9 +52,36 @@ jobs:
           security import "$CERTIFICATE_PATH" -P "$APP_STORE_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security list-keychain -d user -s "$KEYCHAIN_PATH"
+          echo "signing_certificate=installed"
 
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           cp "$PROFILE_PATH" "$HOME/Library/MobileDevice/Provisioning Profiles/app-store-profile.mobileprovision"
+          echo "provisioning_profile=installed"
+
+      - name: Inspect iOS deployment context
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "::group::iOS deployment context"
+          echo "working_directory=$(pwd)"
+          echo "repository_root=$(git rev-parse --show-toplevel)"
+          echo "git_ref_name=$GITHUB_REF_NAME"
+          echo "git_sha=$GITHUB_SHA"
+          test -f pubspec.yaml && echo "pubspec.yaml=found" || { echo "pubspec.yaml=missing"; exit 1; }
+          grep '^version:' pubspec.yaml
+          test -f fastlane/Fastfile && echo "fastlane/Fastfile=found" || { echo "fastlane/Fastfile=missing"; exit 1; }
+          test -f lib/app/main.dart && echo "lib/app/main.dart=found" || { echo "lib/app/main.dart=missing"; exit 1; }
+          test -f ios/Podfile && echo "ios/Podfile=found" || { echo "ios/Podfile=missing"; exit 1; }
+          test -f ios/Podfile.lock && echo "ios/Podfile.lock=found" || { echo "ios/Podfile.lock=missing"; exit 1; }
+          test -f ios/Runner.xcworkspace/contents.xcworkspacedata && echo "ios/Runner.xcworkspace=found" || { echo "ios/Runner.xcworkspace=missing"; exit 1; }
+          security find-identity -v -p codesigning "$RUNNER_TEMP/app-signing.keychain-db"
+          ruby --version
+          bundle --version
+          bundle info fastlane
+          bundle exec pod --version
+          flutter --version
+          xcodebuild -version
+          echo "::endgroup::"
 
       - name: Deploy iOS
         env:
