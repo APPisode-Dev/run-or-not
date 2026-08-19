@@ -140,31 +140,14 @@ platform :ios do
     )
     UI.user_error!("Invalid iOS deployment tag: #{deployment_tag}") unless deployment_tag_match
 
-    pubspec_version_match = File.read(pubspec_path).match(
-      /^version:\s*(\d+\.\d+\.\d+)\+(\d+)/
-    )
-    UI.user_error!("pubspec.yaml version was not found: #{pubspec_path}") unless pubspec_version_match
-
-    pubspec_version = pubspec_version_match[1]
-    pubspec_build_number = pubspec_version_match[2].to_i
     tag_version = deployment_tag_match[1]
     tag_build_number = deployment_tag_match[2].to_i
 
-    UI.message("pubspec version: #{pubspec_version}+#{pubspec_build_number}")
     UI.message("Tag version: #{tag_version}+#{tag_build_number}")
 
-    UI.user_error!(
-      "Tag version #{tag_version} does not match pubspec version #{pubspec_version}"
-    ) unless tag_version == pubspec_version
-
-    UI.user_error!(
-      "Tag build number #{tag_build_number} is lower than pubspec build number #{pubspec_build_number}"
-    ) if tag_build_number < pubspec_build_number
-
     bundle_id = ENV.fetch("IOS_BUNDLE_ID", "com.appisode.runOrNot")
-    next_build_number = tag_build_number
 
-    UI.message("Selected iOS build: #{pubspec_version}+#{next_build_number}")
+    UI.message("Selected iOS build: #{tag_version}+#{tag_build_number}")
 
     update_code_signing_settings(
       use_automatic_signing: false,
@@ -212,8 +195,8 @@ platform :ios do
         "flutter build ipa " \
         "--release " \
         "--target=lib/app/main.dart " \
-        "--build-name=#{pubspec_version} " \
-        "--build-number=#{next_build_number} " \
+        "--build-name=#{tag_version} " \
+        "--build-number=#{tag_build_number} " \
         "--export-options-plist=#{export_options_path}"
       )
     end
