@@ -1,0 +1,80 @@
+default_platform(:ios)
+
+platform :android do
+  desc "Build and upload Android App Bundle to Google Play"
+  lane :deploy do
+    sh("flutter pub get")
+    sh("flutter build appbundle --release")
+
+    upload_to_play_store(
+      json_key: ENV.fetch("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH"),
+      package_name: ENV.fetch("ANDROID_PACKAGE_NAME", "com.appisode.run_or_not"),
+      aab: "build/app/outputs/bundle/release/app-release.aab",
+      track: ENV.fetch("ANDROID_TRACK", "internal"),
+      release_status: ENV.fetch("ANDROID_RELEASE_STATUS", "draft"),
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end
+
+platform :ios do
+  desc "Build and upload iOS IPA to TestFlight"
+  lane :deploy do
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
+      key_content: ENV.fetch("APP_STORE_CONNECT_API_KEY_BASE64"),
+      is_key_content_base64: true,
+      in_house: false
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/Runner.xcodeproj",
+      team_id: ENV.fetch("IOS_TEAM_ID"),
+      targets: ["Runner"],
+      profile_name: ENV.fetch("IOS_PROVISIONING_PROFILE_NAME"),
+      code_sign_identity: "Apple Distribution"
+    )
+
+    export_options_path = "ios/ExportOptions.ci.plist"
+    File.write(export_options_path, <<~PLIST)
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+      <dict>
+        <key>method</key>
+        <string>app-store</string>
+        <key>signingStyle</key>
+        <string>manual</string>
+        <key>teamID</key>
+        <string>#{ENV.fetch("IOS_TEAM_ID")}</string>
+        <key>provisioningProfiles</key>
+        <dict>
+          <key>#{ENV.fetch("IOS_BUNDLE_ID", "com.appisode.runOrNot")}</key>
+          <string>#{ENV.fetch("IOS_PROVISIONING_PROFILE_NAME")}</string>
+        </dict>
+        <key>uploadBitcode</key>
+        <false/>
+        <key>uploadSymbols</key>
+        <true/>
+      </dict>
+      </plist>
+    PLIST
+
+    sh("flutter pub get")
+    sh("flutter build ipa --release --export-options-plist=#{export_options_path}")
+
+    ipa_path = Dir["build/ios/ipa/*.ipa"].first
+    UI.user_error!("IPA file was not generated") unless ipa_path
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: ipa_path,
+      skip_waiting_for_build_processing: true
+    )
+  end
+end
