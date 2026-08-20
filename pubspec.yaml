@@ -15,7 +15,7 @@ dependencies:
   provider: ^6.1.5
   go_router: ^15.1.2
   get_it: ^8.0.3
-  rive: ^0.13.14
+  rive: ^0.14.11
 
 dev_dependencies:
   flutter_test:
@@ -54,8 +54,7 @@ flutter:
           weight: 600
         - asset: assets/fonts/Pretendard-Bold.otf
           weight: 700
-          
+
     - family: mabi
       fonts:
         - asset: assets/fonts/Mabinogi_Classic_TTF.ttf
-          

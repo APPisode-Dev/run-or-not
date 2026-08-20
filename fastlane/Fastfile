@@ -1,0 +1,212 @@
+require "time"
+
+opt_out_usage
+default_platform(:ios)
+
+project_root = File.expand_path("..", __dir__)
+
+platform :android do
+  desc "Build and upload Android App Bundle to Google Play"
+  lane :deploy do
+    json_key = ENV.fetch("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH")
+    package_name = ENV.fetch("ANDROID_PACKAGE_NAME", "com.appisode.run_or_not")
+    track = ENV.fetch("ANDROID_TRACK", "internal")
+    deployment_tag = ENV.fetch("ANDROID_DEPLOY_TAG")
+    changes_not_sent_for_review = ENV.fetch(
+      "ANDROID_CHANGES_NOT_SENT_FOR_REVIEW",
+      "true"
+    ) == "true"
+    aab_path = File.join(
+      project_root,
+      "build/app/outputs/bundle/release/app-release.aab"
+    )
+
+    UI.header("Android deployment context")
+    UI.message("Lane working directory: #{Dir.pwd}")
+    UI.message("Project root: #{project_root}")
+    UI.message("Package: #{package_name}")
+    UI.message("Track: #{track}")
+    UI.message("Deployment tag: #{deployment_tag}")
+    UI.message("Changes not sent for review: #{changes_not_sent_for_review}")
+
+    deployment_tag_match = deployment_tag.match(
+      /\Aandroid\/(\d+\.\d+\.\d+)\+(\d+)-(\d{10})\z/
+    )
+    UI.user_error!(
+      "Invalid Android deployment tag: #{deployment_tag}. " \
+      "Expected android/<version>+<build>-<YYMMDDHHMM>"
+    ) unless deployment_tag_match
+
+    tag_version = deployment_tag_match[1]
+    tag_build_number = deployment_tag_match[2].to_i
+    tag_timestamp = deployment_tag_match[3]
+
+    UI.user_error!("Android build number must be greater than 0: #{tag_build_number}") if tag_build_number <= 0
+
+    begin
+      parsed_tag_time = Time.strptime(tag_timestamp, "%y%m%d%H%M")
+      unless parsed_tag_time.strftime("%y%m%d%H%M") == tag_timestamp
+        UI.user_error!("Invalid Android deployment tag timestamp: #{tag_timestamp}")
+      end
+    rescue ArgumentError
+      UI.user_error!("Invalid Android deployment tag timestamp: #{tag_timestamp}")
+    end
+
+    UI.message("Tag version: #{tag_version}+#{tag_build_number}")
+    UI.message("Tag timestamp: #{tag_timestamp}")
+    UI.message("Selected Android build: #{tag_version}+#{tag_build_number}")
+
+    sh("flutter pub get")
+    sh(
+      "flutter build appbundle " \
+      "--release " \
+      "--target=lib/app/main.dart " \
+      "--build-name=#{tag_version} " \
+      "--build-number=#{tag_build_number}"
+    )
+
+    UI.user_error!("Android App Bundle was not generated: #{aab_path}") unless File.exist?(aab_path)
+    UI.message("Generated AAB: #{aab_path} (#{File.size(aab_path)} bytes)")
+
+    begin
+      upload_to_play_store(
+        json_key: json_key,
+        package_name: package_name,
+        aab: aab_path,
+        track: track,
+        release_status: ENV.fetch("ANDROID_RELEASE_STATUS", "draft"),
+        changes_not_sent_for_review: changes_not_sent_for_review,
+        rescue_changes_not_sent_for_review: true,
+        skip_upload_metadata: true,
+        skip_upload_changelogs: true,
+        skip_upload_images: true,
+        skip_upload_screenshots: true
+      )
+    rescue => error
+      UI.error("Google Play upload failed: #{error.class}: #{error.message}")
+      UI.error(error.full_message(highlight: false, order: :top))
+      raise
+    end
+  end
+end
+
+platform :ios do
+  desc "Build and upload iOS IPA to TestFlight"
+  lane :deploy do
+    pubspec_path = File.join(project_root, "pubspec.yaml")
+    podfile_path = File.join(project_root, "ios/Podfile")
+    xcode_project_path = File.join(project_root, "ios/Runner.xcodeproj")
+    deployment_tag = ENV.fetch("IOS_DEPLOY_TAG")
+
+    UI.header("iOS deployment context")
+    UI.message("Lane working directory: #{Dir.pwd}")
+    UI.message("Project root: #{project_root}")
+    UI.message("pubspec.yaml: #{pubspec_path} (exists: #{File.exist?(pubspec_path)})")
+    UI.message("Podfile: #{podfile_path} (exists: #{File.exist?(podfile_path)})")
+    UI.message("Xcode project: #{xcode_project_path} (exists: #{File.exist?(xcode_project_path)})")
+    UI.message("Deployment tag: #{deployment_tag}")
+
+    UI.user_error!("pubspec.yaml was not found: #{pubspec_path}") unless File.exist?(pubspec_path)
+    UI.user_error!("Podfile was not found: #{podfile_path}") unless File.exist?(podfile_path)
+    UI.user_error!("Xcode project was not found: #{xcode_project_path}") unless File.exist?(xcode_project_path)
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
+      key_content: ENV.fetch("APP_STORE_CONNECT_API_KEY_BASE64"),
+      is_key_content_base64: true,
+      in_house: false
+    )
+
+    deployment_tag_match = deployment_tag.match(
+      /\Aios\/(\d+\.\d+\.\d+)\+(\d+)-(\d{10})\z/
+    )
+    UI.user_error!(
+      "Invalid iOS deployment tag: #{deployment_tag}. " \
+      "Expected ios/<version>+<build>-<YYMMDDHHMM>"
+    ) unless deployment_tag_match
+
+    tag_version = deployment_tag_match[1]
+    tag_build_number = deployment_tag_match[2].to_i
+    tag_timestamp = deployment_tag_match[3]
+
+    UI.user_error!("iOS build number must be greater than 0: #{tag_build_number}") if tag_build_number <= 0
+
+    begin
+      parsed_tag_time = Time.strptime(tag_timestamp, "%y%m%d%H%M")
+      unless parsed_tag_time.strftime("%y%m%d%H%M") == tag_timestamp
+        UI.user_error!("Invalid iOS deployment tag timestamp: #{tag_timestamp}")
+      end
+    rescue ArgumentError
+      UI.user_error!("Invalid iOS deployment tag timestamp: #{tag_timestamp}")
+    end
+
+    UI.message("Tag version: #{tag_version}+#{tag_build_number}")
+    UI.message("Tag timestamp: #{tag_timestamp}")
+
+    bundle_id = ENV.fetch("IOS_BUNDLE_ID", "com.appisode.runOrNot")
+
+    UI.message("Selected iOS build: #{tag_version}+#{tag_build_number}")
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: xcode_project_path,
+      team_id: ENV.fetch("IOS_TEAM_ID"),
+      targets: ["Runner"],
+      profile_name: ENV.fetch("IOS_PROVISIONING_PROFILE_NAME"),
+      code_sign_identity: "Apple Distribution"
+    )
+
+    export_options_path = File.join(project_root, "ios/ExportOptions.ci.plist")
+    File.write(export_options_path, <<~PLIST)
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+      <dict>
+        <key>method</key>
+        <string>app-store</string>
+        <key>signingStyle</key>
+        <string>manual</string>
+        <key>teamID</key>
+        <string>#{ENV.fetch("IOS_TEAM_ID")}</string>
+        <key>provisioningProfiles</key>
+        <dict>
+          <key>#{bundle_id}</key>
+          <string>#{ENV.fetch("IOS_PROVISIONING_PROFILE_NAME")}</string>
+        </dict>
+        <key>uploadBitcode</key>
+        <false/>
+        <key>uploadSymbols</key>
+        <true/>
+      </dict>
+      </plist>
+    PLIST
+
+    Dir.chdir(project_root) do
+      UI.message("Installing Flutter packages from: #{Dir.pwd}")
+      sh("flutter pub get")
+
+      UI.message("Installing CocoaPods dependencies with Bundler")
+      sh("bundle exec pod install --project-directory=ios")
+
+      UI.message("Building IPA from: #{Dir.pwd}")
+      sh(
+        "flutter build ipa " \
+        "--release " \
+        "--target=lib/app/main.dart " \
+        "--build-name=#{tag_version} " \
+        "--build-number=#{tag_build_number} " \
+        "--export-options-plist=#{export_options_path}"
+      )
+    end
+
+    ipa_path = Dir[File.join(project_root, "build/ios/ipa/*.ipa")].first
+    UI.user_error!("IPA file was not generated") unless ipa_path
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: ipa_path,
+      skip_waiting_for_build_processing: true
+    )
+  end
+end
