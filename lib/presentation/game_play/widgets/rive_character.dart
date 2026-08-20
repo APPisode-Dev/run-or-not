@@ -11,7 +11,7 @@ class RiveCharacter extends StatefulWidget {
   const RiveCharacter({
     super.key,
     required this.assetPath,
-    required this.isRunning
+    required this.isRunning,
   });
 
   @override
@@ -19,28 +19,59 @@ class RiveCharacter extends StatefulWidget {
 }
 
 class _RiveCharacterState extends State<RiveCharacter> {
-  Rive.SMITrigger? _startTrigger;
+  late Rive.FileLoader _fileLoader;
+  Rive.TriggerInput? _startTrigger;
 
-  void _onRiveInit(Rive.Artboard artboard) {
-    final controller = Rive.StateMachineController.fromArtboard(artboard, RiveSettingConst.stateMachineName);
+  @override
+  void initState() {
+    super.initState();
+    _fileLoader = _createFileLoader();
+  }
 
-    if (controller == null) {
-      return;
+  Rive.FileLoader _createFileLoader() {
+    return Rive.FileLoader.fromAsset(
+      widget.assetPath.toRivePath(),
+      riveFactory: Rive.Factory.rive,
+    );
+  }
+
+  void _onRiveLoaded(Rive.RiveLoaded state) {
+    _startTrigger?.dispose();
+    // The current .riv assets expose the running action as a state machine input.
+    // ignore: deprecated_member_use
+    _startTrigger = state.controller.stateMachine.trigger(
+      RiveSettingConst.runningTriggerName,
+    );
+
+    if (widget.isRunning) {
+      _startTrigger?.fire();
     }
-
-    artboard.addController(controller);
-
-    final input = controller.findSMI(RiveSettingConst.runningTriggerName);
-    _startTrigger = input;
   }
 
   @override
   void didUpdateWidget(covariant RiveCharacter oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    if (widget.assetPath != oldWidget.assetPath) {
+      final previousFileLoader = _fileLoader;
+      _startTrigger?.dispose();
+      _startTrigger = null;
+      _fileLoader = _createFileLoader();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        previousFileLoader.dispose();
+      });
+    }
+
     if (widget.isRunning) {
       _startTrigger?.fire();
     }
+  }
+
+  @override
+  void dispose() {
+    _startTrigger?.dispose();
+    _fileLoader.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,11 +81,23 @@ class _RiveCharacterState extends State<RiveCharacter> {
       child: Container(
         width: WidgetSizes.avatarCircleSize,
         height: WidgetSizes.avatarCircleSize,
-        child: Rive.RiveAnimation.asset(
-          widget.assetPath.toRivePath(),
-          artboard: 'Artboard',
-          onInit: _onRiveInit,
-          fit: BoxFit.contain,
+        child: Rive.RiveWidgetBuilder(
+          key: ValueKey(_fileLoader),
+          fileLoader: _fileLoader,
+          artboardSelector: Rive.ArtboardSelector.byName('Artboard'),
+          stateMachineSelector: Rive.StateMachineSelector.byName(
+            RiveSettingConst.stateMachineName,
+          ),
+          onLoaded: _onRiveLoaded,
+          builder:
+              (context, state) => switch (state) {
+                Rive.RiveLoading() => const SizedBox.shrink(),
+                Rive.RiveFailed() => const SizedBox.shrink(),
+                Rive.RiveLoaded() => Rive.RiveWidget(
+                  controller: state.controller,
+                  fit: Rive.Fit.contain,
+                ),
+              },
         ),
       ),
     );

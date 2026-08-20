@@ -4,8 +4,9 @@ import 'package:rive/rive.dart';
 import 'package:run_or_not/core/di/injector.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   setupDependencies();
-  await RiveFile.initialize();
+  await RiveNative.init();
   runApp(MyApp(router: getIt<GoRouter>()));
 }
 
