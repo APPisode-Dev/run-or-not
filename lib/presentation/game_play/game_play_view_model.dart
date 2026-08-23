@@ -1,12 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:run_or_not/domain/model/character/custom_character.dart';
+import 'package:run_or_not/domain/const/motion_effect_rule.dart';
 import 'package:run_or_not/domain/use_case/game/game_use_case.dart';
 import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
-import 'package:run_or_not/domain/const/character_random_min_max.dart';
 import 'package:run_or_not/presentation/game_play/game_play_intent.dart';
 import 'package:run_or_not/presentation/game_play/game_play_state.dart';
-import 'package:run_or_not/core/utils/random_util.dart';
 import 'package:run_or_not/presentation/router/app_screen.dart';
 import 'package:run_or_not/presentation/router/service/router_service.dart';
 
@@ -20,21 +19,11 @@ class GamePlayViewModel extends ChangeNotifier {
   GamePlayViewModel(
     this._routerService,
     List<(String, String)> characterTuples,
-    this._gameUseCase,
-  ): _state = GamePlayState(
-    characterList: characterTuples.map((character) {
-      final _name = character.$1;
-      final _assetName = character.$2;
-
-      return CustomCharacter(
-        name: _name,
-        assetName: _assetName,
-        speed: RandomUtil.getDoubleMinMaxRangeValue(CharacterRandomMinMax.randomMin, CharacterRandomMinMax.randomMax),
-        positionX: 0,
-        isFinished: false,
-      );
-    }).toList(),
-  );
+    GameUseCase gameUseCase,
+  ) : _state = GamePlayState(
+        characterList: gameUseCase.createInitialCharacters(characterTuples),
+      ),
+      _gameUseCase = gameUseCase;
 
   @override
   void dispose() {
@@ -59,27 +48,50 @@ class GamePlayViewModel extends ChangeNotifier {
         _routerService.goBack();
         break;
       case RankingButtonTapped():
-        final charactersTuples = _state.characterList.map((character) {
-          return (character.name, character.assetName, character.rank);
-        }).toList();
-        _routerService.navigateTo(AppScreen.ranking.path, extra: charactersTuples);
+        final charactersTuples =
+            _state.characterList.map((character) {
+              return (character.name, character.assetName, character.rank);
+            }).toList();
+        _routerService.navigateTo(
+          AppScreen.ranking.path,
+          extra: charactersTuples,
+        );
         break;
       case StartButtonTapped():
-        send(SetGameStart(true));
+        await send(SetGameStart(true));
         _timer?.cancel();
 
-        _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-          send(UpdatePositionXWithSpeed());
+        _timer = Timer.periodic(MotionEffectRule.gameTickDuration, (
+          timer,
+        ) async {
+          await send(UpdatePositionXWithSpeed());
 
-          bool _isAllPlayerFinish = _state.characterList.every((character) => character.isFinished);
-          if (_isAllPlayerFinish) {
+          final isAllPlayerFinish = _state.characterList.every(
+            (character) => character.isFinished,
+          );
+          if (isAllPlayerFinish) {
             _timerDispose();
-            send(SetGameStart(false));
+            await send(SetGameStart(false));
           }
         });
         break;
       case RetryButtonTapped():
-        send(StartButtonTapped());
+        final resetCharacters = _gameUseCase.resetCharacters(
+          _state.characterList,
+        );
+        await send(SetCharacterList(resetCharacters));
+        await send(StartButtonTapped());
+        break;
+      case UpdatePositionXWithSpeed():
+        final maxDeviceWidth =
+            _state.maxDeviceWidth -
+            (WidgetSizes.avatarCircleSize + _state.horizontalSafeArea);
+        final updatedCharacters = _gameUseCase.moveCharactersAndAssignRanks(
+          maxDeviceWidth,
+          _state.characterList,
+        );
+        await send(SetCharacterList(updatedCharacters));
+        break;
       default:
         break;
     }
@@ -87,37 +99,18 @@ class GamePlayViewModel extends ChangeNotifier {
 
   GamePlayState reduce(GamePlayState current, GamePlayIntent intent) {
     switch (intent) {
-      case UpdatePositionXWithSpeed():
-        final double _avatarCircleSize = WidgetSizes.avatarCircleSize;
-        final double _maxDeviceWidth = current.maxDeviceWidth - (_avatarCircleSize + current.horizontalSafeArea);
-
-        final _updatedCharacterList = _gameUseCase.moveCharactersAndAssignRanks(
-            _avatarCircleSize,
-            _maxDeviceWidth,
-            current.characterList
-        );
-
-        return current.copyWith(characterList: _updatedCharacterList);
-      case UpdateMaxDeviceWidthAndSafeArea(:final maxDeviceWidth, :final horizontalSafeArea):
-        return current.copyWith(maxDeviceWidth: maxDeviceWidth, horizontalSafeArea: horizontalSafeArea);
-      case RetryButtonTapped():
-        final newCharacterList = current.characterList.map((character){
-          return CustomCharacter(
-            name: character.name,
-            assetName: character.assetName,
-            speed: RandomUtil.getDoubleMinMaxRangeValue(CharacterRandomMinMax.randomMin, CharacterRandomMinMax.randomMax),
-            positionX: 0,
-            isFinished: false,
-          );
-        }).toList();
-
+      case SetCharacterList(:final characters):
+        return current.copyWith(characterList: characters);
+      case UpdateMaxDeviceWidthAndSafeArea(
+        :final maxDeviceWidth,
+        :final horizontalSafeArea,
+      ):
         return current.copyWith(
-          characterList: newCharacterList
+          maxDeviceWidth: maxDeviceWidth,
+          horizontalSafeArea: horizontalSafeArea,
         );
-    case SetGameStart(:final isStart):
-      return current.copyWith(
-          isStarting: isStart
-      );
+      case SetGameStart(:final isStart):
+        return current.copyWith(isStarting: isStart);
       default:
         return current;
     }

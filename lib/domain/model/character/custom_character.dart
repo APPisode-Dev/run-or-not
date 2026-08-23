@@ -1,3 +1,5 @@
+import 'package:run_or_not/domain/model/character/motion_effect.dart';
+
 class CustomCharacter {
   final String name;
   final String assetName;
@@ -5,6 +7,9 @@ class CustomCharacter {
   final double positionX;
   final bool isFinished;
   final int rank;
+  final MotionEffect motionEffect;
+  final int effectRemainingTicks;
+  final double speedMultiplier;
 
   const CustomCharacter({
     required this.name,
@@ -13,6 +18,9 @@ class CustomCharacter {
     this.positionX = 0,
     this.isFinished = false,
     this.rank = 0,
+    this.motionEffect = MotionEffect.normal,
+    this.effectRemainingTicks = 0,
+    this.speedMultiplier = 1,
   });
 
   CustomCharacter copyWith({
@@ -22,6 +30,9 @@ class CustomCharacter {
     double? positionX,
     bool? isFinished,
     int? rank,
+    MotionEffect? motionEffect,
+    int? effectRemainingTicks,
+    double? speedMultiplier,
   }) {
     return CustomCharacter(
       name: name ?? this.name,
@@ -30,6 +41,9 @@ class CustomCharacter {
       positionX: positionX ?? this.positionX,
       isFinished: isFinished ?? this.isFinished,
       rank: rank ?? this.rank,
+      motionEffect: motionEffect ?? this.motionEffect,
+      effectRemainingTicks: effectRemainingTicks ?? this.effectRemainingTicks,
+      speedMultiplier: speedMultiplier ?? this.speedMultiplier,
     );
   }
 }

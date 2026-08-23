@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:run_or_not/design_system/color/app_colors.dart';
 import 'package:run_or_not/design_system/text/custom_text_style.dart';
+import 'package:run_or_not/domain/const/motion_effect_rule.dart';
 import 'package:run_or_not/domain/model/character/custom_character.dart';
+import 'package:run_or_not/domain/model/character/motion_effect.dart';
 import 'package:run_or_not/presentation/core/const/widget_sizes.dart';
 import 'package:run_or_not/presentation/game_play/game_play_view_model.dart';
+import 'package:run_or_not/presentation/game_play/widgets/horse_motion_effect_view.dart';
 import 'package:run_or_not/presentation/game_play/widgets/rive_character.dart';
 
 class RaceLineListView extends StatelessWidget {
@@ -20,54 +23,58 @@ class RaceLineListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: ListView(
-        children:
-            characters.asMap().entries.map((entry) {
-              final _index = entry.key;
-              final _character = entry.value;
-              final _isEven = _index % 2 == 0;
+      child: ListView.builder(
+        itemCount: characters.length,
+        itemBuilder: (context, index) {
+          final character = characters[index];
+          final isEven = index.isEven;
 
-              return Selector<GamePlayViewModel, bool>(
-                selector:
-                    (context, viewModel) =>
-                        viewModel.state.characterList[_index].isFinished,
-                builder: (context, isFinished, _) {
-                  return Container(
-                    height: WidgetSizes.gamePlayContainerHeight,
-                    decoration: BoxDecoration(
-                      color: _getLineBackgroundColor(_isEven, isFinished),
-                    ),
-                    child: Stack(
-                      children: [
-                        _characterAvatarView(_index, _character.assetName),
-                        _characterNameView(_character.name),
-                        _rankView(_index),
-                      ],
-                    ),
-                  );
-                },
+          return Selector<GamePlayViewModel, bool>(
+            selector:
+                (context, viewModel) =>
+                    viewModel.state.characterList[index].isFinished,
+            builder: (context, isFinished, _) {
+              return Container(
+                height: WidgetSizes.gamePlayContainerHeight,
+                decoration: BoxDecoration(
+                  color: _getLineBackgroundColor(isEven, isFinished),
+                ),
+                child: Stack(
+                  children: [
+                    _characterAvatarView(index, character.assetName),
+                    _characterNameView(character.name),
+                    _rankView(index),
+                  ],
+                ),
               );
-            }).toList(),
+            },
+          );
+        },
       ),
     );
   }
 
   Widget _characterAvatarView(int index, String assetPath) {
-    return Selector<GamePlayViewModel, (double, bool, bool)>(
+    return Selector<GamePlayViewModel, (double, bool, bool, MotionEffect)>(
       selector: (context, viewModel) {
         final _character = viewModel.state.characterList[index];
-        return (_character.positionX, _character.isFinished, viewModel.state.isStarting);
+        return (
+          _character.positionX,
+          _character.isFinished,
+          viewModel.state.isStarting,
+          _character.motionEffect,
+        );
       },
       builder: (context, tuple, _) {
-        final (_positionX, _isFinished, isStart) = tuple;
+        final (_positionX, _isFinished, isStart, motionEffect) = tuple;
         if (_isFinished) return const SizedBox.shrink();
 
         return AnimatedPositioned(
-          duration: const Duration(milliseconds: 100),
+          duration: MotionEffectRule.gameTickDuration,
           left: _positionX.clamp(0, maxWidth),
-          child: RiveCharacter(
-            assetPath: assetPath,
-            isRunning: isStart,
+          child: HorseMotionEffectView(
+            motionEffect: motionEffect,
+            child: RiveCharacter(assetPath: assetPath, isRunning: isStart),
           ),
         );
       },
