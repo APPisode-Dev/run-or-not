@@ -1,21 +1,21 @@
 PODS:
   - Flutter (1.0.0)
-  - rive_common (0.0.1):
+  - rive_native (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - rive_common (from `.symlinks/plugins/rive_common/ios`)
+  - rive_native (from `.symlinks/plugins/rive_native/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  rive_common:
-    :path: ".symlinks/plugins/rive_common/ios"
+  rive_native:
+    :path: ".symlinks/plugins/rive_native/ios"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  rive_common: dd421daaf9ae69f0125aa761dd96abd278399952
+  rive_native: c8fbe631855835dc84f7d59befcdb43de3ac48d4
 
 PODFILE CHECKSUM: 070ba68abd8b72dde8c295c27eaa99587db6f0b7
 
