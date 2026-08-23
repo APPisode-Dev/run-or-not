@@ -1,0 +1,99 @@
+name: Deploy iOS
+
+on:
+  push:
+    tags:
+      - "ios/*"
+
+concurrency:
+  group: deploy-ios
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    env:
+      FASTLANE_OPT_OUT_USAGE: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Install Apple signing assets
+        env:
+          APP_STORE_CERTIFICATE_BASE64: ${{ secrets.APP_STORE_CERTIFICATE_BASE64 }}
+          APP_STORE_CERTIFICATE_PASSWORD: ${{ secrets.APP_STORE_CERTIFICATE_PASSWORD }}
+          APP_STORE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APP_STORE_PROVISIONING_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          CERTIFICATE_PATH="$RUNNER_TEMP/app-store-certificate.p12"
+          PROFILE_PATH="$RUNNER_TEMP/app-store-profile.mobileprovision"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+
+          echo "$APP_STORE_CERTIFICATE_BASE64" | base64 --decode > "$CERTIFICATE_PATH"
+          echo "$APP_STORE_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$PROFILE_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERTIFICATE_PATH" -P "$APP_STORE_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+          echo "signing_certificate=installed"
+
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$PROFILE_PATH" "$HOME/Library/MobileDevice/Provisioning Profiles/app-store-profile.mobileprovision"
+          echo "provisioning_profile=installed"
+
+      - name: Inspect iOS deployment context
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "::group::iOS deployment context"
+          echo "working_directory=$(pwd)"
+          echo "repository_root=$(git rev-parse --show-toplevel)"
+          echo "git_ref_name=$GITHUB_REF_NAME"
+          echo "git_sha=$GITHUB_SHA"
+          test -f pubspec.yaml && echo "pubspec.yaml=found" || { echo "pubspec.yaml=missing"; exit 1; }
+          grep '^version:' pubspec.yaml
+          test -f fastlane/Fastfile && echo "fastlane/Fastfile=found" || { echo "fastlane/Fastfile=missing"; exit 1; }
+          test -f lib/app/main.dart && echo "lib/app/main.dart=found" || { echo "lib/app/main.dart=missing"; exit 1; }
+          test -f ios/Podfile && echo "ios/Podfile=found" || { echo "ios/Podfile=missing"; exit 1; }
+          test -f ios/Podfile.lock && echo "ios/Podfile.lock=found" || { echo "ios/Podfile.lock=missing"; exit 1; }
+          test -f ios/Runner/Info.plist && echo "ios/Runner/Info.plist=found" || { echo "ios/Runner/Info.plist=missing"; exit 1; }
+          EXPORT_COMPLIANCE_VALUE="$(plutil -extract ITSAppUsesNonExemptEncryption raw -o - ios/Runner/Info.plist)"
+          test "$EXPORT_COMPLIANCE_VALUE" = "false" || { echo "ITSAppUsesNonExemptEncryption must be false"; exit 1; }
+          echo "ITSAppUsesNonExemptEncryption=$EXPORT_COMPLIANCE_VALUE"
+          test -f ios/Runner.xcworkspace/contents.xcworkspacedata && echo "ios/Runner.xcworkspace=found" || { echo "ios/Runner.xcworkspace=missing"; exit 1; }
+          security find-identity -v -p codesigning "$RUNNER_TEMP/app-signing.keychain-db"
+          ruby --version
+          bundle --version
+          bundle info fastlane
+          bundle exec pod --version
+          flutter --version
+          xcodebuild -version
+          echo "::endgroup::"
+
+      - name: Deploy iOS
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          IOS_BUNDLE_ID: com.appisode.runOrNot
+          IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+          IOS_DEPLOY_TAG: ${{ github.ref_name }}
+        run: bundle exec fastlane ios deploy

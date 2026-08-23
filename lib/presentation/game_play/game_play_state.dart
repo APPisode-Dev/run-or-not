@@ -7,7 +7,8 @@ class GamePlayState {
   bool get shouldShowRankingButton {
     return characterList.every((character) => character.isFinished);
   }
-  bool isStarting;
+
+  final bool isStarting;
 
   GamePlayState({
     required this.characterList,
