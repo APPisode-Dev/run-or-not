@@ -47,3 +47,5 @@ app.*.map.json
 analysis_options.yaml
 **/*.keystore
 **/key.properties
+google-play-service-account.json
+ios/ExportOptions.ci.plist
