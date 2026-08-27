@@ -39,5 +39,19 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
+    next unless target.name == 'rive_native'
+
+    target.shell_script_build_phases.each do |phase|
+      next unless phase.name == '[CP-User] Rive Native Compile'
+      next if phase.shell_script.include?('cd "${SRCROOT}/../.."')
+
+      # rive_native 0.1.11 invokes `dart run` from ios/Pods on a clean build.
+      # Run it from the Flutter project root so Dart can resolve pubspec.yaml.
+      phase.shell_script = phase.shell_script.sub(
+        "set -e\n",
+        "set -e\n\ncd \"${SRCROOT}/../..\"\n",
+      )
+    end
   end
 end
