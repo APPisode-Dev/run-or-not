@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rive/rive.dart';
 import 'package:run_or_not/core/di/injector.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupDependencies();
-  await RiveNative.init();
   runApp(MyApp(router: getIt<GoRouter>()));
 }
 

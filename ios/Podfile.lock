@@ -14,9 +14,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/rive_native/ios"
 
 SPEC CHECKSUMS:
-  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
   rive_native: c8fbe631855835dc84f7d59befcdb43de3ac48d4
 
-PODFILE CHECKSUM: 070ba68abd8b72dde8c295c27eaa99587db6f0b7
+PODFILE CHECKSUM: f0e731b263151c646eb5934dfae34dc2a5383798
 
 COCOAPODS: 1.16.2
