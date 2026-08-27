@@ -32,6 +32,21 @@ jobs:
           flutter-version: "3.38.9"
           cache: true
 
+      - name: Install Android NDK
+        shell: bash
+        run: |
+          sdkmanager_path="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$sdkmanager_path"
+
+          set +o pipefail
+          yes | "$sdkmanager_path" --licenses > /dev/null
+          license_status=${PIPESTATUS[1]}
+          set -o pipefail
+          test "$license_status" -eq 0
+
+          "$sdkmanager_path" "ndk;29.0.13113456"
+          test -f "$ANDROID_SDK_ROOT/ndk/29.0.13113456/source.properties"
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
