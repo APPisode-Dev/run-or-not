@@ -31,7 +31,10 @@ class _RiveCharacterState extends State<RiveCharacter> {
   Rive.FileLoader _createFileLoader() {
     return Rive.FileLoader.fromAsset(
       widget.assetPath.toRivePath(),
-      riveFactory: Rive.Factory.rive,
+      // Use Flutter's renderer for iOS release/TestFlight stability.
+      // Factory.rive uses the native Metal texture path, which is the path
+      // that rendered these characters invisible in the 1.1.0 iOS build.
+      riveFactory: Rive.Factory.flutter,
     );
   }
 
@@ -92,7 +95,10 @@ class _RiveCharacterState extends State<RiveCharacter> {
           builder:
               (context, state) => switch (state) {
                 Rive.RiveLoading() => const SizedBox.shrink(),
-                Rive.RiveFailed() => const SizedBox.shrink(),
+                Rive.RiveFailed() => Image.asset(
+                  widget.assetPath,
+                  fit: BoxFit.contain,
+                ),
                 Rive.RiveLoaded() => Rive.RiveWidget(
                   controller: state.controller,
                   fit: Rive.Fit.contain,

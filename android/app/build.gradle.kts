@@ -20,7 +20,9 @@ if (hasReleaseKeystore) {
 android {
     namespace = "com.appisode.run_or_not"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Use the complete NDK already installed locally. The 27.0.12077973
+    // directory is an incomplete SDK Manager download (no source.properties).
+    ndkVersion = "29.0.13113456"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
